@@ -4,8 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
-final backgroundColor = Color.fromARGB(1, 20, 20, 43);
-final primaryColor = Color.fromARGB(1, 17, 95, 167);
+Color kColorFromHex(String color) {
+  final hexColorTrim = color.toUpperCase().replaceAll('#', '').replaceAll('0X', '').padLeft(8, 'F');
+  return Color(int.parse(hexColorTrim, radix: 16));
+}
+
+final backgroundColor = kColorFromHex('#14142B');
+final primaryColor = kColorFromHex('#115FA7');
 
 final WebSocketLink socketLink = WebSocketLink(
   'wss://hasura-3fad0791.nhost.app/v1/graphql',
@@ -19,7 +24,7 @@ final HttpLink httpLink = HttpLink(
   'https://hasura-3fad0791.nhost.app/v1/graphql',
 );
 
-final link = Link.split((request) => request.isSubscription, (socketLink), httpLink);
+final link = Link.split((request) => request.isSubscription, socketLink, httpLink);
 
 final client = ValueNotifier<GraphQLClient>(GraphQLClient(link: link, cache: GraphQLCache()));
 
@@ -64,7 +69,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: backgroundColor,
         brightness: Brightness.dark,
-        //primaryColor: primaryColor,
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
@@ -80,27 +84,30 @@ class MyHomePage extends HookWidget {
   Widget build(BuildContext context) {
     final controller = useTabController(initialLength: 2);
     return Scaffold(
-      body: Column(
-        children: [
-          SafeArea(
-              child: TabBar(tabs: [
-            Tab(
-              child: Text('Donations'),
+      body: Container(
+        color: backgroundColor,
+        child: Column(
+          children: [
+            SafeArea(
+                child: TabBar(tabs: [
+              Tab(
+                child: Text('Donations'.toUpperCase()),
+              ),
+              Tab(
+                child: Text('Usages'.toUpperCase()),
+              )
+            ], controller: controller)),
+            Expanded(
+              child: TabBarView(
+                controller: controller,
+                children: [
+                  Donations(),
+                  DonationUsages(),
+                ],
+              ),
             ),
-            Tab(
-              child: Text('Usages'),
-            )
-          ], controller: controller)),
-          Expanded(
-            child: TabBarView(
-              controller: controller,
-              children: [
-                Donations(),
-                DonationUsages(),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
