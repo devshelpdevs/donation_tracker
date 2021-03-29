@@ -9,6 +9,8 @@ Color kColorFromHex(String color) {
   return Color(int.parse(hexColorTrim, radix: 16));
 }
 
+final tableDonations = 'temp_money_donations';
+final tableUsages = 'temp_money_used_for';
 final backgroundColor = kColorFromHex('#14142B');
 final primaryColor = kColorFromHex('#115FA7');
 
@@ -30,7 +32,7 @@ final client = ValueNotifier<GraphQLClient>(GraphQLClient(link: link, cache: Gra
 
 String getDonation = """
   subscription GetDonation {
-    temp_money_donations {
+    $tableDonations {
       created_at
       donator
       id
@@ -42,7 +44,7 @@ String getDonation = """
 
 String getUsage = """
   subscription GetUsage {
-    temp_money_used_for {
+    $tableUsages {
       created_at
       id
       storage_image_name
@@ -65,21 +67,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Usage overview of DevsHelpDevs\'donations',
       theme: ThemeData(
         scaffoldBackgroundColor: backgroundColor,
         brightness: Brightness.dark,
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends HookWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
-
   @override
   Widget build(BuildContext context) {
     final controller = useTabController(initialLength: 2);
@@ -89,14 +88,15 @@ class MyHomePage extends HookWidget {
         child: Column(
           children: [
             SafeArea(
-                child: TabBar(tabs: [
-              Tab(
-                child: Text('Donations'.toUpperCase()),
-              ),
-              Tab(
-                child: Text('Usages'.toUpperCase()),
-              )
-            ], controller: controller)),
+              child: TabBar(tabs: [
+                Tab(
+                  child: Text('Received Donations'.toUpperCase()),
+                ),
+                Tab(
+                  child: Text('Used for'.toUpperCase()),
+                )
+              ], controller: controller),
+            ),
             Expanded(
               child: TabBarView(
                 controller: controller,
@@ -116,71 +116,42 @@ class MyHomePage extends HookWidget {
 class Donations extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Subscription(
-        builder: (QueryResult result) {
-          if (result.hasException) {
-            return Text(result.exception.toString());
-          }
+    return Subscription(
+      builder: (QueryResult result) {
+        if (result.hasException) {
+          return Text(result.exception.toString());
+        }
 
-          if (result.isLoading) {
-            return Center(
-              child: const CircularProgressIndicator(),
-            );
-          }
-          return ListView.separated(
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Text(
-                          'Donator',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Text(
-                        'Amount',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                );
-              }
-              final data = Donator.fromMap(result.data['temp_money_donations'][index - 1]);
-              return Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Text(
-                        data.name,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Text(
-                      data.amount,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              );
-            },
-            separatorBuilder: (context, index) => Divider(),
-            itemCount: result.data['temp_money_donations'].length + 1,
+        if (result.isLoading) {
+          return Center(
+            child: const CircularProgressIndicator(),
           );
-        },
-        options: SubscriptionOptions(
-          document: gql(getDonation),
-        ),
+        }
+        final List data = result.data![tableDonations];
+        return DataTable(
+          rows: data.map((element) {
+            final data = Donator.fromMap(element);
+            return DataRow(cells: [
+              DataCell(Text(data.name)),
+              DataCell(Text(data.createdAt)),
+              DataCell(Text(data.amount)),
+            ]);
+          }).cast<DataRow>().toList(),
+          columns: [
+            DataColumn(
+              label: const Text('Name'),
+            ),
+            DataColumn(
+              label: const Text('Date'),
+            ),
+            DataColumn(
+              label: const Text('Amount'),
+            ),
+          ],
+        );
+      },
+      options: SubscriptionOptions(
+        document: gql(getDonation),
       ),
     );
   }
@@ -189,71 +160,46 @@ class Donations extends StatelessWidget {
 class DonationUsages extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Subscription(
-        builder: (QueryResult result) {
-          if (result.hasException) {
-            return Text(result.exception.toString());
-          }
+    return Subscription(
+      builder: (QueryResult result) {
+        if (result.hasException) {
+          return Text(result.exception.toString());
+        }
 
-          if (result.isLoading) {
-            return Center(
-              child: const CircularProgressIndicator(),
-            );
-          }
-          return ListView.separated(
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Text(
-                        'Amount',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Text(
-                          'Usage',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              }
-              final data = Usage.fromMap(result.data['temp_money_used_for'][index - 1]);
-              return Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Text(
-                      data.amount,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Text(
-                        data.whatFor,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-            separatorBuilder: (context, index) => Divider(),
-            itemCount: result.data['temp_money_used_for'].length + 1,
+        if (result.isLoading) {
+          return Center(
+            child: const CircularProgressIndicator(),
           );
-        },
-        options: SubscriptionOptions(
-          document: gql(getUsage),
-        ),
+        }
+        final List data = result.data![tableUsages];
+        return DataTable(
+          rows: data.map((element) {
+            final data = Usage.fromMap(element);
+            return DataRow(cells: [
+              DataCell(Text(data.createdAt)),
+              DataCell(Text(data.amount)),
+              DataCell(Text(data.whatFor)),
+              DataCell(data.image == null? Container() : Image.network(data.image!)),
+            ]);
+          }).cast<DataRow>().toList(),
+          columns: [
+            DataColumn(
+              label: const Text('Date'),
+            ),
+            DataColumn(
+              label: const Text('Amount'),
+            ),
+            DataColumn(
+              label: const Text('For'),
+            ),
+            DataColumn(
+              label: const Text('Image'),
+            ),
+          ],
+        );
+      },
+      options: SubscriptionOptions(
+        document: gql(getUsage),
       ),
     );
   }
