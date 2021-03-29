@@ -179,7 +179,7 @@ class DonationUsages extends StatelessWidget {
               DataCell(Text(data.createdAt)),
               DataCell(Text(data.amount)),
               DataCell(Text(data.whatFor)),
-              DataCell(data.image == null? Container() : Image.network(data.image!)),
+              DataCell(data.imageLink == null ? Container() : Image.network(data.imageLink!)),
             ]);
           }).cast<DataRow>().toList(),
           columns: [
