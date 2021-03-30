@@ -35,7 +35,7 @@ final client = ValueNotifier<GraphQLClient>(
 
 String getDonation = """
   subscription GetDonation {
-    $tableDonations(order_by: {donation_date: desc}) {
+    $tableDonations(order_by: {donation_date: asc}) {
       created_at
       donator
       id
@@ -48,7 +48,7 @@ String getDonation = """
 
 String getUsage = """
   subscription GetUsage {
-    $tableUsages(order_by: {usage_date: desc}) {
+    $tableUsages(order_by: {usage_date: asc}) {
       created_at
       id
       storage_image_name
