@@ -8,7 +8,7 @@ class Usage {
 
   final int id;
   final String whatFor;
-  final String amount;
+  final int amount;
   final String createdAt;
   final String? image;
   String? get imageLink => image == null ? null : 'https://backend-3fad0791.nhost.app/storage/o/public/$image';

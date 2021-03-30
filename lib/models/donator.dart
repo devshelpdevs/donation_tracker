@@ -8,7 +8,7 @@ class Donator {
 
   final int id;
   final String name;
-  final String amount;
+  final int amount;
   final String createdAt;
 
   @override
