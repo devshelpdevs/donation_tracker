@@ -1,11 +1,11 @@
 {
-    "name": "donation_tracker",
-    "short_name": "donation_tracker",
+    "name": "DevsHelpDevs Donation Tracker",
+    "short_name": "DevsHelpDevs Donation Tracker",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "DevsHelpDevs Donation Tracker",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
