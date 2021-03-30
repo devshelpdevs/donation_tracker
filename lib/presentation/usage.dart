@@ -40,8 +40,12 @@ class DonationUsages extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
-                  child: Text('Total on current date: ${data.total.toCurrency()}', style: Theme.of(context).textTheme.headline6, textAlign: TextAlign.center),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
+                  child: Text(
+                      'Total on current date: ${data.total.toCurrency()}',
+                      style: Theme.of(context).textTheme.headline6,
+                      textAlign: TextAlign.center),
                 ),
                 Divider(),
                 Expanded(
@@ -51,22 +55,34 @@ class DonationUsages extends StatelessWidget {
                           (data) {
                             return DataRow(
                               cells: [
-                                DataCell(Text(data.createdAt.toDateTime().format())),
+                                DataCell(Text(data.date.toDateTime().format())),
                                 DataCell(Text(data.amount.toCurrency())),
                                 DataCell(Text(data.whatFor)),
                                 DataCell(
                                   ConstrainedBox(
-                                    constraints: const BoxConstraints(maxWidth: 100, maxHeight: 60),
+                                    constraints: const BoxConstraints(
+                                        maxWidth: 100, maxHeight: 60),
                                     child: data.imageLink == null
                                         ? Container()
                                         : Image.network(
                                             data.imageLink!,
-                                            loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                                              if (loadingProgress == null) return child;
+                                            loadingBuilder:
+                                                (BuildContext context,
+                                                    Widget child,
+                                                    ImageChunkEvent?
+                                                        loadingProgress) {
+                                              if (loadingProgress == null)
+                                                return child;
                                               return Center(
-                                                child: CircularProgressIndicator(
-                                                  value: loadingProgress.expectedTotalBytes != null
-                                                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  value: loadingProgress
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          loadingProgress
+                                                              .expectedTotalBytes!
                                                       : null,
                                                 ),
                                               );
@@ -81,12 +97,23 @@ class DonationUsages extends StatelessWidget {
                                         return AlertDialog(
                                           content: Image.network(
                                             data.imageLink!,
-                                            loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                                              if (loadingProgress == null) return child;
+                                            loadingBuilder:
+                                                (BuildContext context,
+                                                    Widget child,
+                                                    ImageChunkEvent?
+                                                        loadingProgress) {
+                                              if (loadingProgress == null)
+                                                return child;
                                               return Center(
-                                                child: CircularProgressIndicator(
-                                                  value: loadingProgress.expectedTotalBytes != null
-                                                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  value: loadingProgress
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          loadingProgress
+                                                              .expectedTotalBytes!
                                                       : null,
                                                 ),
                                               );

@@ -1,4 +1,3 @@
-
 import 'package:donation_tracker/constants.dart';
 import 'package:donation_tracker/models/donator.dart';
 import 'package:donation_tracker/models/total.dart';
@@ -28,10 +27,10 @@ class Donations extends StatelessWidget {
               var total = 0;
               final List<Donator> data = result.data![tableDonations]
                   .map((element) {
-                final donator = Donator.fromMap(element);
-                total += donator.amount;
-                return donator;
-              })
+                    final donator = Donator.fromMap(element);
+                    total += donator.amount;
+                    return donator;
+                  })
                   .cast<Donator>()
                   .toList();
               return TotalData(data, total);
@@ -41,20 +40,24 @@ class Donations extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
-                  child: Text('Total on current date: ${data.total.toCurrency()}', style: Theme.of(context).textTheme.headline6, textAlign: TextAlign.center),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
+                  child: Text(
+                      'Total on current date: ${data.total.toCurrency()}',
+                      style: Theme.of(context).textTheme.headline6,
+                      textAlign: TextAlign.center),
                 ),
                 Divider(),
                 Expanded(
                   child: DataTable(
                     rows: data.items
                         .map((data) {
-                      return DataRow(cells: [
-                        DataCell(Text(data.name)),
-                        DataCell(Text(data.createdAt.toDateTime().format())),
-                        DataCell(Text(data.amount.toCurrency())),
-                      ]);
-                    })
+                          return DataRow(cells: [
+                            DataCell(Text(data.name)),
+                            DataCell(Text(data.date.toDateTime().format())),
+                            DataCell(Text(data.amount.toCurrency())),
+                          ]);
+                        })
                         .cast<DataRow>()
                         .toList(),
                     columns: [

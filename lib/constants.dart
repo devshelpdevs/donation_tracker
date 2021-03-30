@@ -1,9 +1,12 @@
-
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 Color kColorFromHex(String color) {
-  final hexColorTrim = color.toUpperCase().replaceAll('#', '').replaceAll('0X', '').padLeft(8, 'F');
+  final hexColorTrim = color
+      .toUpperCase()
+      .replaceAll('#', '')
+      .replaceAll('0X', '')
+      .padLeft(8, 'F');
   return Color(int.parse(hexColorTrim, radix: 16));
 }
 
@@ -24,9 +27,11 @@ final HttpLink _httpLink = HttpLink(
   'https://hasura-3fad0791.nhost.app/v1/graphql',
 );
 
-final _link = Link.split((request) => request.isSubscription, _socketLink, _httpLink);
+final _link =
+    Link.split((request) => request.isSubscription, _socketLink, _httpLink);
 
-final client = ValueNotifier<GraphQLClient>(GraphQLClient(link: _link, cache: GraphQLCache()));
+final client = ValueNotifier<GraphQLClient>(
+    GraphQLClient(link: _link, cache: GraphQLCache()));
 
 String getDonation = """
   subscription GetDonation {
@@ -36,6 +41,7 @@ String getDonation = """
       id
       updated_at
       value
+      donation_date
     }
   }
 """;
@@ -49,6 +55,7 @@ String getUsage = """
       updated_at
       usage
       value
+      usage_date
     }
   }
 """;
