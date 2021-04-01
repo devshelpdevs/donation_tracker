@@ -36,44 +36,46 @@ class Donations extends StatelessWidget {
               return TotalData(data, total);
             }, [result.timestamp]);
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
-                  child: Text(
-                      'Total on current date: ${data.total.toCurrency()}',
-                      style: Theme.of(context).textTheme.headline6,
-                      textAlign: TextAlign.center),
-                ),
-                Divider(),
-                Expanded(
-                  child: DataTable(
-                    rows: data.items
-                        .map((data) {
-                          return DataRow(cells: [
-                            DataCell(Text(data.name)),
-                            DataCell(Text(data.date.toDateTime().format())),
-                            DataCell(Text(data.amount.toCurrency())),
-                          ]);
-                        })
-                        .cast<DataRow>()
-                        .toList(),
-                    columns: [
-                      DataColumn(
-                        label: const Text('Name'),
-                      ),
-                      DataColumn(
-                        label: const Text('Date'),
-                      ),
-                      DataColumn(
-                        label: const Text('Amount'),
-                      ),
-                    ],
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 6),
+                    child: Text(
+                        'Total on current date: ${data.total.toCurrency()}',
+                        style: Theme.of(context).textTheme.headline6,
+                        textAlign: TextAlign.center),
                   ),
-                ),
-              ],
+                  Divider(),
+                  Expanded(
+                    child: DataTable(
+                      rows: data.items
+                          .map((data) {
+                            return DataRow(cells: [
+                              DataCell(Text(data.name)),
+                              DataCell(Text(data.date.toDateTime().format())),
+                              DataCell(Text(data.amount.toCurrency())),
+                            ]);
+                          })
+                          .cast<DataRow>()
+                          .toList(),
+                      columns: [
+                        DataColumn(
+                          label: const Text('Name'),
+                        ),
+                        DataColumn(
+                          label: const Text('Date'),
+                        ),
+                        DataColumn(
+                          label: const Text('Amount'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             );
           },
         );
