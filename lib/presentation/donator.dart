@@ -49,30 +49,28 @@ class Donations extends StatelessWidget {
                         textAlign: TextAlign.center),
                   ),
                   Divider(),
-                  Expanded(
-                    child: DataTable(
-                      rows: data.items
-                          .map((data) {
-                            return DataRow(cells: [
-                              DataCell(Text(data.name)),
-                              DataCell(Text(data.date.toDateTime().format())),
-                              DataCell(Text(data.amount.toCurrency())),
-                            ]);
-                          })
-                          .cast<DataRow>()
-                          .toList(),
-                      columns: [
-                        DataColumn(
-                          label: const Text('Name'),
-                        ),
-                        DataColumn(
-                          label: const Text('Date'),
-                        ),
-                        DataColumn(
-                          label: const Text('Amount'),
-                        ),
-                      ],
-                    ),
+                  DataTable(
+                    rows: data.items
+                        .map((data) {
+                          return DataRow(cells: [
+                            DataCell(Text(data.name)),
+                            DataCell(Text(data.date.toDateTime().format())),
+                            DataCell(Text(data.amount.toCurrency())),
+                          ]);
+                        })
+                        .cast<DataRow>()
+                        .toList(),
+                    columns: [
+                      DataColumn(
+                        label: const Text('Name'),
+                      ),
+                      DataColumn(
+                        label: const Text('Date'),
+                      ),
+                      DataColumn(
+                        label: const Text('Amount'),
+                      ),
+                    ],
                   ),
                 ],
               ),

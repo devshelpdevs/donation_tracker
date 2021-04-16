@@ -37,6 +37,7 @@ class MyHomePage extends HookWidget {
       body: Container(
         color: backgroundColor,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SafeArea(
               child: TabBar(tabs: [
