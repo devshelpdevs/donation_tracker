@@ -1,16 +1,17 @@
 import 'package:donation_tracker/constants.dart';
-import 'package:donation_tracker/presentation/donator.dart';
+import 'package:donation_tracker/donation_manager.dart';
+import 'package:donation_tracker/presentation/donations.dart';
 import 'package:donation_tracker/presentation/usage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:get_it/get_it.dart';
 
+import 'nhost_service.dart';
 
 void main() {
-  runApp(GraphQLProvider(
-    child: MyApp(),
-    client: client,
-  ));
+  GetIt.I.registerSingleton(NhostService());
+  GetIt.I.registerSingleton(DonationManager());
+
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -29,10 +30,18 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends HookWidget {
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
+  late final controller =
+      TabController(initialIndex: 0, length: 2, vsync: this);
+
   @override
   Widget build(BuildContext context) {
-    final controller = useTabController(initialLength: 2);
     return Scaffold(
       body: Container(
         color: backgroundColor,
@@ -62,5 +71,11 @@ class MyHomePage extends HookWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 }

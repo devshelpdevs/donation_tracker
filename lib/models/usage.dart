@@ -6,6 +6,8 @@ class Usage {
         data['storage_image_name']);
   }
 
+  bool get isWaitingCause => date == null;
+
   final int id;
   final String whatFor;
   final int amount;

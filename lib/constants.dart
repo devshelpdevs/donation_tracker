@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:graphql/client.dart';
 
 Color kColorFromHex(String color) {
   final hexColorTrim = color
@@ -35,7 +35,7 @@ final client = ValueNotifier<GraphQLClient>(
 
 String getDonation = """
   subscription GetDonation {
-    $tableDonations(order_by: {donation_date: asc}) {
+    $tableDonations(order_by: {donation_date: desc}) {
       created_at
       donator
       id
@@ -48,7 +48,7 @@ String getDonation = """
 
 String getUsage = """
   subscription GetUsage {
-    $tableUsages(order_by: {usage_date: asc}) {
+    $tableUsages(order_by: {usage_date: desc}) {
       created_at
       id
       storage_image_name
