@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'nhost_service.dart';
 
@@ -33,18 +34,22 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatefulWidget with GetItStatefulWidgetMixin {
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage>
-    with SingleTickerProviderStateMixin {
+    with GetItStateMixin, SingleTickerProviderStateMixin {
   late final controller =
-      TabController(initialIndex: 0, length: 2, vsync: this);
+      TabController(initialIndex: 0, length: 3, vsync: this);
 
   @override
   Widget build(BuildContext context) {
+    final numDonations =
+        watchX((DonationManager m) => m.donationUpdates).length;
+    final numUsed = watchX((DonationManager m) => m.usageUpdates).length;
+    final numWait = watchX((DonationManager m) => m.waitingUpdates).length;
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -54,22 +59,34 @@ class _MyHomePageState extends State<MyHomePage>
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _Header(),
-              SafeArea(
-                child: TabBar(tabs: [
-                  Tab(
-                    child: Text('Received Donations'.toUpperCase()),
-                  ),
-                  Tab(
-                    child: Text('Used for'.toUpperCase()),
-                  )
-                ], controller: controller),
+              SizedBox(
+                height: 8,
               ),
+              TabBar(tabs: [
+                Tab(
+                  child: Text(
+                      'Received Donations'.toUpperCase() + ' ($numDonations)'),
+                ),
+                Tab(
+                  child: Text('Used for'.toUpperCase() + ' ($numUsed)'),
+                ),
+                Tab(
+                  child: Text('Waiting for Help'.toUpperCase() + ' ($numWait)'),
+                )
+              ], controller: controller),
               Expanded(
                 child: TabBarView(
                   controller: controller,
                   children: [
                     Donations(),
-                    DonationUsages(),
+                    DonationUsages(
+                      usageUpdates: GetIt.I<DonationManager>().usageUpdates,
+                      hasUsageDates: true,
+                    ),
+                    DonationUsages(
+                      usageUpdates: GetIt.I<DonationManager>().waitingUpdates,
+                      hasUsageDates: false,
+                    ),
                   ],
                 ),
               ),
@@ -88,9 +105,7 @@ class _MyHomePageState extends State<MyHomePage>
 }
 
 class _Header extends StatelessWidget with GetItMixin {
-  _Header({
-    Key? key,
-  }) : super(key: key);
+  _Header({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -107,10 +122,55 @@ class _Header extends StatelessWidget with GetItMixin {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Text(
-                  'DevsHelpDevs Donation Tracker',
-                  style: Theme.of(context).textTheme.headline4,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkWell(
+                      onTap: () async {
+                        await launch('https://www.devshelpdevs.org');
+                      },
+                      child: SvgPicture.asset(
+                        'assets/images/devshelpdevs-logo.svg',
+                        height: 100,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 0),
+                      child: TextButton(
+                        onPressed: () async {
+                          await launch('https://paypal.me/pools/c/8xPwkVP3th');
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 8.0, top: 8, right: 8, bottom: 9),
+                          child: Text(
+                            'Donate here',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline5!
+                                .copyWith(color: Colors.white),
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: const Color(0xff115FA7),
+                          side: BorderSide(
+                              color: const Color(0xff115FA7), width: 3),
+                          shape: StadiumBorder(),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Text(
+                        'Donation Tracker',
+                        style: Theme.of(context).textTheme.headline4,
+                      ),
+                    ),
+                    SizedBox(),
+                  ],
                 ),
               ),
               _TotalLine(
@@ -126,35 +186,6 @@ class _Header extends StatelessWidget with GetItMixin {
                 valueName: 'waiting',
               ),
             ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 48),
-          child: TextButton(
-            onPressed: () {},
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                'Donate here',
-                style: Theme.of(context)
-                    .textTheme
-                    .headline5!
-                    .copyWith(color: Colors.white),
-              ),
-            ),
-            style: OutlinedButton.styleFrom(
-              backgroundColor: const Color(0xff115FA7),
-              side: BorderSide(color: const Color(0xff115FA7), width: 3),
-              shape: StadiumBorder(),
-            ),
-          ),
-        ),
-        Spacer(),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SvgPicture.asset(
-            'assets/images/devshelpdevs-logo.svg',
-            height: 100,
           ),
         ),
       ],
@@ -180,10 +211,13 @@ class _TotalLine extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SizedBox(width: 150, child: Text('Totalc $valueName:')),
-          Text(
-            '${value.toCurrency()}',
-            textAlign: TextAlign.right,
+          SizedBox(width: 100, child: Text('Total $valueName:')),
+          SizedBox(
+            width: 100,
+            child: Text(
+              '${value.toCurrency()}',
+              textAlign: TextAlign.right,
+            ),
           ),
         ],
       ),

@@ -15,6 +15,8 @@ final tableUsages = 'temp_money_used_for';
 final backgroundColor = kColorFromHex('#14142B');
 final primaryColor = kColorFromHex('#115FA7');
 
+const tableHeaderStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
+
 final WebSocketLink _socketLink = WebSocketLink(
   'wss://hasura-3fad0791.nhost.app/v1/graphql',
   config: SocketClientConfig(

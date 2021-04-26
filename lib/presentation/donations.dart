@@ -1,3 +1,4 @@
+import 'package:donation_tracker/constants.dart';
 import 'package:donation_tracker/donation_manager.dart';
 import 'package:donation_tracker/utils.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,6 @@ import 'package:get_it_mixin/get_it_mixin.dart';
 class Donations extends StatelessWidget with GetItMixin {
   @override
   Widget build(BuildContext context) {
-    var total = 0;
     final donations = watchX((DonationManager m) => m.donationUpdates);
     return SingleChildScrollView(
       child: Column(
@@ -25,13 +25,13 @@ class Donations extends StatelessWidget with GetItMixin {
                 .toList(),
             columns: [
               DataColumn(
-                label: const Text('Name'),
+                label: const Text('Name', style: tableHeaderStyle),
               ),
               DataColumn(
-                label: const Text('Date'),
+                label: const Text('Date', style: tableHeaderStyle),
               ),
               DataColumn(
-                label: const Text('Amount'),
+                label: const Text('Amount', style: tableHeaderStyle),
               ),
             ],
           ),

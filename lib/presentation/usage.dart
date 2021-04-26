@@ -1,21 +1,30 @@
-import 'package:donation_tracker/donation_manager.dart';
+import 'package:donation_tracker/constants.dart';
+import 'package:donation_tracker/models/usage.dart';
 import 'package:donation_tracker/utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 
 class DonationUsages extends StatelessWidget with GetItMixin {
+  final ValueNotifier<List<Usage>> usageUpdates;
+  final bool hasUsageDates;
+
+  DonationUsages(
+      {Key? key, required this.usageUpdates, required this.hasUsageDates})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final usages = watchX((DonationManager d) => d.usageUpdates);
+    final usages =
+        watch<ValueListenable<List<Usage>>, List<Usage>>(target: usageUpdates);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         DefaultTextStyle.merge(
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          style: tableHeaderStyle,
           child: Row(
-            children: const [
-              Expanded(child: Text('Date')),
+            children: [
+              if (hasUsageDates) Expanded(child: Text('Date')),
               Expanded(child: Text('Amount')),
               Expanded(child: Text('Usage')),
               Spacer(),
@@ -36,9 +45,10 @@ class DonationUsages extends StatelessWidget with GetItMixin {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                        child: Text(
-                            data.date?.toDateTime().format() ?? 'missing')),
+                    if (hasUsageDates)
+                      Expanded(
+                          child: Text(
+                              data.date?.toDateTime().format() ?? 'missing')),
                     Expanded(
                         child: Text(
                       data.amount.toCurrency(),
