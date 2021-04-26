@@ -50,6 +50,7 @@ class _MyHomePageState extends State<MyHomePage>
         child: Container(
           color: backgroundColor,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _Header(),
@@ -97,14 +98,21 @@ class _Header extends StatelessWidget with GetItMixin {
     final totalUsed = watchX((DonationManager m) => m.totalUsed);
     final totalWaiting = watchX((DonationManager m) => m.totalWaiting);
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          flex: 1,
+          flex: 2,
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Text(
+                  'DevsHelpDevs Donation Tracker',
+                  style: Theme.of(context).textTheme.headline4,
+                ),
+              ),
               _TotalLine(
                 value: totalDonated,
                 valueName: 'donated',
@@ -120,9 +128,28 @@ class _Header extends StatelessWidget with GetItMixin {
             ],
           ),
         ),
-        const Spacer(
-          flex: 2,
+        Padding(
+          padding: const EdgeInsets.only(top: 48),
+          child: TextButton(
+            onPressed: () {},
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Donate here',
+                style: Theme.of(context)
+                    .textTheme
+                    .headline5!
+                    .copyWith(color: Colors.white),
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              backgroundColor: const Color(0xff115FA7),
+              side: BorderSide(color: const Color(0xff115FA7), width: 3),
+              shape: StadiumBorder(),
+            ),
+          ),
         ),
+        Spacer(),
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: SvgPicture.asset(
@@ -150,9 +177,10 @@ class _TotalLine extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 24),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('Total $valueName:'),
+          SizedBox(width: 150, child: Text('Totalc $valueName:')),
           Text(
             '${value.toCurrency()}',
             textAlign: TextAlign.right,

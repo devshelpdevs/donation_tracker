@@ -1,11 +1,12 @@
 ///We use the same table for already used money as well as for people waiting for help
 /// if [date] is null it means that this is a waiting entry
 class Usage {
-  const Usage(this.id, this.whatFor, this.amount, this.date, this.image);
+  const Usage(
+      this.id, this.whatFor, this.amount, this.date, this.name, this.image);
 
   factory Usage.fromMap(Map<String, dynamic> data) {
     return Usage(data['id'], data['usage'], data['value'], data['usage_date'],
-        data['storage_image_name']);
+        data['receivers_name'], data['storage_image_name']);
   }
 
   bool get isWaitingCause => date == null;
@@ -15,6 +16,7 @@ class Usage {
   final int amount;
   final String? date;
   final String? image;
+  final String? name;
   String? get imageLink => image == null
       ? null
       : 'https://backend-3fad0791.nhost.app/storage/o/public/$image';
