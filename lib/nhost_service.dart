@@ -59,8 +59,9 @@ class NhostService {
     final donationDoc = gql(getDonation);
     final usageDoc = gql(getUsage);
 
-    final Stream<QueryResult> donationTableUpdateStream =
-        client.subscribe(SubscriptionOptions(document: donationDoc));
+    final Stream<QueryResult> donationTableUpdateStream = client
+        .subscribe(SubscriptionOptions(document: donationDoc))
+        .asBroadcastStream();
     donationTableUpdates = donationTableUpdateStream
         .where((event) => (!event.hasException) && (event.data != null))
         .map((event) {
@@ -68,8 +69,9 @@ class NhostService {
       return itemsAsMap.map((x) => Donation.fromMap(x!)).toList();
     });
 
-    final Stream<QueryResult> usageTableUpdateStream =
-        client.subscribe(SubscriptionOptions(document: usageDoc));
+    final Stream<QueryResult> usageTableUpdateStream = client
+        .subscribe(SubscriptionOptions(document: usageDoc))
+        .asBroadcastStream();
     usageTableUpdates = usageTableUpdateStream
         .where((event) => (!event.hasException) && (event.data != null))
         .map((event) {

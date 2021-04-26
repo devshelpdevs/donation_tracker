@@ -1,142 +1,115 @@
 import 'package:donation_tracker/donation_manager.dart';
-import 'package:donation_tracker/models/usage.dart';
 import 'package:donation_tracker/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
+import 'package:get_it_mixin/get_it_mixin.dart';
 
-class DonationUsages extends StatelessWidget {
+class DonationUsages extends StatelessWidget with GetItMixin {
   @override
   Widget build(BuildContext context) {
-    // return Subscription(
-    //   builder: (QueryResult result) {
-    //     if (result.hasException) {
-    //       return Text(result.exception.toString());
-    //     }
+    final usages = watchX((DonationManager d) => d.usageUpdates);
 
-    //     if (result.isLoading) {
-    //       return Center(
-    //         child: const CircularProgressIndicator(),
-    //       );
-    //     }
-
-    // final data = useMemoized<TotalData<Usage>>(() {
-    //   var total = 0;
-    //   final List<Usage> data = result.data![tableUsages]
-    //       .map((element) {
-    //         final donator = Usage.fromMap(element);
-    //         total += donator.amount;
-    //         return donator;
-    //       })
-    //       .cast<Usage>()
-    //       .toList();
-    //   return TotalData(data, total);
-    // }, [result.timestamp]);
-    final total = 0;
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6),
-        child: Text('Total on current date: ${total.toCurrency()}',
-            style: Theme.of(context).textTheme.headline6,
-            textAlign: TextAlign.center),
-      ),
-      Divider(),
-      Row(
-        children: const [
-          Expanded(child: Text('Date')),
-          Expanded(child: Text('Amount')),
-          Expanded(child: Text('For')),
-          Expanded(child: Text('Image')),
-        ],
-      ),
-      ValueListenableBuilder<List<Usage>>(
-          valueListenable: GetIt.I<DonationManager>().usageUpdates,
-          builder: (context, usages, child) {
-            return Expanded(
-              child: ListView(
-                  children: usages.map(
-                (data) {
-                  return Row(
-                    children: [
-                      Expanded(
-                          child: Text(
-                              data.date?.toDateTime().format() ?? 'missing')),
-                      Expanded(child: Text(data.amount.toCurrency())),
-                      Expanded(child: Text(data.whatFor)),
-                      Expanded(
-                        child: InkWell(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(
-                                maxWidth: 100, maxHeight: 60),
-                            child: data.imageLink == null
-                                ? Container()
-                                : Image.network(
-                                    data.imageLink!,
-                                    loadingBuilder: (BuildContext context,
-                                        Widget child,
-                                        ImageChunkEvent? loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        DefaultTextStyle.merge(
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          child: Row(
+            children: const [
+              Expanded(child: Text('Date')),
+              Expanded(child: Text('Amount')),
+              Expanded(child: Text('Usage')),
+              Expanded(child: Text('Recipient')),
+              Spacer(),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView(
+              children: usages.map(
+            (data) {
+              return Row(
+                children: [
+                  Expanded(
+                      child:
+                          Text(data.date?.toDateTime().format() ?? 'missing')),
+                  Expanded(child: Text(data.amount.toCurrency())),
+                  Expanded(child: Text(data.whatFor)),
+                  // Expanded(child: Text(data.),)
+                  Expanded(
+                    child: InkWell(
+                      child: ConstrainedBox(
+                        constraints:
+                            const BoxConstraints(maxWidth: 100, maxHeight: 60),
+                        child: data.imageLink == null
+                            ? Container()
+                            : Image.network(
+                                data.imageLink!,
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
                                                   null
                                               ? loadingProgress
                                                       .cumulativeBytesLoaded /
                                                   loadingProgress
                                                       .expectedTotalBytes!
                                               : null,
-                                        ),
-                                      );
-                                    },
-                                    fit: BoxFit.contain,
-                                  ),
-                          ),
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  content: Image.network(
-                                    data.imageLink!,
-                                    loadingBuilder: (BuildContext context,
-                                        Widget child,
-                                        ImageChunkEvent? loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
+                                    ),
+                                  );
+                                },
+                                fit: BoxFit.contain,
+                              ),
+                      ),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              content: Image.network(
+                                data.imageLink!,
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
                                                   null
                                               ? loadingProgress
                                                       .cumulativeBytesLoaded /
                                                   loadingProgress
                                                       .expectedTotalBytes!
                                               : null,
-                                        ),
-                                      );
-                                    },
-                                    fit: BoxFit.contain,
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('Close'),
-                                    )
-                                  ],
-                                );
-                              },
+                                    ),
+                                  );
+                                },
+                                fit: BoxFit.contain,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('Close'),
+                                )
+                              ],
                             );
                           },
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ).toList()),
-            );
-          })
-    ]);
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ).toList()),
+        )
+      ]),
+    );
   }
 }

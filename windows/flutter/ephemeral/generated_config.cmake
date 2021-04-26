@@ -10,7 +10,7 @@ list(APPEND FLUTTER_TOOL_ENVIRONMENT
   "FLUTTER_EPHEMERAL_DIR=C:\\Entwicklung\\DevsHelpDevs\\donation_tracker\\windows\\flutter\\ephemeral"
   "PROJECT_DIR=C:\\Entwicklung\\DevsHelpDevs\\donation_tracker"
   "FLUTTER_TARGET=C:\\Entwicklung\\DevsHelpDevs\\donation_tracker\\lib\\main.dart"
-  "DART_DEFINES=flutter.inspector.structuredErrors%3Dtrue"
+  "DART_DEFINES=Zmx1dHRlci5pbnNwZWN0b3Iuc3RydWN0dXJlZEVycm9ycz10cnVl,RkxVVFRFUl9XRUJfQVVUT19ERVRFQ1Q9dHJ1ZQ=="
   "DART_OBFUSCATION=false"
   "TRACK_WIDGET_CREATION=true"
   "TREE_SHAKE_ICONS=false"

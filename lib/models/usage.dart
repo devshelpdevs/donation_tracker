@@ -1,3 +1,5 @@
+///We use the same table for already used money as well as for people waiting for help
+/// if [date] is null it means that this is a waiting entry
 class Usage {
   const Usage(this.id, this.whatFor, this.amount, this.date, this.image);
 
@@ -11,7 +13,7 @@ class Usage {
   final int id;
   final String whatFor;
   final int amount;
-  final String date;
+  final String? date;
   final String? image;
   String? get imageLink => image == null
       ? null

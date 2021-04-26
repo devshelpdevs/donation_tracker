@@ -2,8 +2,11 @@ import 'package:donation_tracker/constants.dart';
 import 'package:donation_tracker/donation_manager.dart';
 import 'package:donation_tracker/presentation/donations.dart';
 import 'package:donation_tracker/presentation/usage.dart';
+import 'package:donation_tracker/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
+import 'package:get_it_mixin/get_it_mixin.dart';
 
 import 'nhost_service.dart';
 
@@ -43,31 +46,34 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: backgroundColor,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SafeArea(
-              child: TabBar(tabs: [
-                Tab(
-                  child: Text('Received Donations'.toUpperCase()),
-                ),
-                Tab(
-                  child: Text('Used for'.toUpperCase()),
-                )
-              ], controller: controller),
-            ),
-            Expanded(
-              child: TabBarView(
-                controller: controller,
-                children: [
-                  Donations(),
-                  DonationUsages(),
-                ],
+      body: SafeArea(
+        child: Container(
+          color: backgroundColor,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _Header(),
+              SafeArea(
+                child: TabBar(tabs: [
+                  Tab(
+                    child: Text('Received Donations'.toUpperCase()),
+                  ),
+                  Tab(
+                    child: Text('Used for'.toUpperCase()),
+                  )
+                ], controller: controller),
               ),
-            ),
-          ],
+              Expanded(
+                child: TabBarView(
+                  controller: controller,
+                  children: [
+                    Donations(),
+                    DonationUsages(),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -77,5 +83,82 @@ class _MyHomePageState extends State<MyHomePage>
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+}
+
+class _Header extends StatelessWidget with GetItMixin {
+  _Header({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final totalDonated = watchX((DonationManager m) => m.totalDonated);
+    final totalUsed = watchX((DonationManager m) => m.totalUsed);
+    final totalWaiting = watchX((DonationManager m) => m.totalWaiting);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Expanded(
+          flex: 1,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _TotalLine(
+                value: totalDonated,
+                valueName: 'donated',
+              ),
+              _TotalLine(
+                value: totalUsed,
+                valueName: 'used',
+              ),
+              _TotalLine(
+                value: totalWaiting,
+                valueName: 'waiting',
+              ),
+            ],
+          ),
+        ),
+        const Spacer(
+          flex: 2,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SvgPicture.asset(
+            'assets/images/devshelpdevs-logo.svg',
+            height: 100,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TotalLine extends StatelessWidget {
+  const _TotalLine({
+    Key? key,
+    required this.value,
+    required this.valueName,
+  }) : super(key: key);
+
+  final int value;
+  final valueName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('Total $valueName:'),
+          Text(
+            '${value.toCurrency()}',
+            textAlign: TextAlign.right,
+          ),
+        ],
+      ),
+    );
   }
 }
