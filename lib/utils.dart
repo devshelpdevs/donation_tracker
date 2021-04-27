@@ -18,7 +18,7 @@ extension ToDateExtension on String {
 
 extension ToStringCurrency on num {
   String toCurrency() {
-    var amount = this / 100;
-    return _numberFormat.format(amount).replaceAll(',00', '') + '€';
+    var amount = this ~/ 100;
+    return _numberFormat.format(amount) + '€';
   }
 }
