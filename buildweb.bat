@@ -1,1 +1,1 @@
-flutter build web --release  --dart-define SERVER=3fad0791.nhost.app
+flutter build web --release  --dart-define SERVER=3fad0791.nhost.app --web-renderer html
