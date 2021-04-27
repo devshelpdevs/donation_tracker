@@ -17,17 +17,20 @@ final primaryColor = kColorFromHex('#115FA7');
 
 const tableHeaderStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
 
+const server =
+    '${const String.fromEnvironment('SERVER', defaultValue: '3fad0791.nhost.app')}';
+
+const graphQlEndPoint = 'hasura-$server/v1/graphql';
+
 final WebSocketLink _socketLink = WebSocketLink(
-  'wss://hasura-3fad0791.nhost.app/v1/graphql',
+  'wss://$graphQlEndPoint',
   config: SocketClientConfig(
     autoReconnect: true,
     inactivityTimeout: Duration(seconds: 30),
   ),
 );
 
-final HttpLink _httpLink = HttpLink(
-  'https://hasura-3fad0791.nhost.app/v1/graphql',
-);
+final HttpLink _httpLink = HttpLink('https://$graphQlEndPoint');
 
 final _link =
     Link.split((request) => request.isSubscription, _socketLink, _httpLink);
