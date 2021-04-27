@@ -1,0 +1,32 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "donation_tracker_public",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--dart-define",
+                "SERVER=3fad0791.nhost.app",
+            ]
+        },
+                {
+            "name": "donation_tracker_staging_private",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--dart-define",
+                "SERVER=63b34375.nhost.app",
+                "--dart-define",
+                "HASURA_SECRET=4bd0efc0d8ba8636fd63b3ab25f35c56",
+                "--dart-define",
+                "USER_ID=e79ea538-7b5d-4854-8acd-a284c1923209",
+                "--dart-define",
+                "AUTH_PASSWORD=uZKFT5QU5eaEmk",
+            ]
+        }
+    ]
+}
