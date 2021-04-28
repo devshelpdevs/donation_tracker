@@ -14,7 +14,7 @@
             ]
         },
                 {
-            "name": "donation_tracker_staging_private",
+            "name": "donation_tracker_staging_write_access",
             "request": "launch",
             "type": "dart",
             "args": [

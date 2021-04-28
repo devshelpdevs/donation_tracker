@@ -18,7 +18,11 @@ final primaryColor = kColorFromHex('#115FA7');
 const tableHeaderStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
 
 const server =
-    '${const String.fromEnvironment('SERVER', defaultValue: '3fad0791.nhost.app')}';
+    const String.fromEnvironment('SERVER', defaultValue: '3fad0791.nhost.app');
+
+const hasuraSecret = const String.fromEnvironment('HASURA_SECRET');
+const userID = const String.fromEnvironment('USER_ID');
+const authPassword = const String.fromEnvironment('AUTH_PASSWORD');
 
 const graphQlEndPoint = 'hasura-$server/v1/graphql';
 

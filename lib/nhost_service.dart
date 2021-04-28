@@ -1,9 +1,12 @@
+import 'package:donation_tracker/constants.dart';
 import 'package:donation_tracker/models/donation.dart';
 import 'package:donation_tracker/models/usage.dart';
 import 'package:graphql/client.dart';
 import 'package:rxdart/rxdart.dart';
 
 class NhostService {
+  bool get hasWriteAccess => hasuraSecret != '';
+
   static const tableDonations = 'temp_money_donations';
   static const tableUsages = 'temp_money_used_for';
 
