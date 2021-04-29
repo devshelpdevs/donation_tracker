@@ -1,8 +1,9 @@
-import 'package:donation_tracker/constants.dart';
-import 'package:donation_tracker/models/donation.dart';
-import 'package:donation_tracker/models/usage.dart';
 import 'package:graphql/client.dart';
 import 'package:rxdart/rxdart.dart';
+
+import 'constants.dart';
+import 'models/donation.dart';
+import 'models/usage.dart';
 
 class NhostService {
   bool get hasWriteAccess => hasuraSecret != '';
@@ -12,7 +13,7 @@ class NhostService {
 
   final WebSocketLink _socketLink = WebSocketLink(
     'wss://hasura-3fad0791.nhost.app/v1/graphql',
-    config: SocketClientConfig(
+    config: const SocketClientConfig(
       autoReconnect: true,
       inactivityTimeout: Duration(seconds: 30),
     ),
@@ -27,7 +28,7 @@ class NhostService {
 
   late final client = GraphQLClient(link: _link, cache: GraphQLCache());
 
-  String getDonation = """
+  String getDonation = '''
   subscription GetDonation {
     $tableDonations(order_by: {donation_date: desc}) {
       created_at
@@ -38,9 +39,9 @@ class NhostService {
       donation_date
     }
   }
-""";
+''';
 
-  String getUsage = """
+  String getUsage = '''
   subscription GetUsage {
     $tableUsages(order_by: {usage_date: desc}) {
       created_at
@@ -52,7 +53,7 @@ class NhostService {
       usage_date
     }
   }
-""";
+''';
 
   late Stream<List<Donation>> donationTableUpdates;
   late Stream<List<Usage>> usageTableUpdates;
@@ -62,7 +63,7 @@ class NhostService {
     final donationDoc = gql(getDonation);
     final usageDoc = gql(getUsage);
 
-    final Stream<QueryResult> donationTableUpdateStream = client
+    final donationTableUpdateStream = client
         .subscribe(SubscriptionOptions(document: donationDoc))
         .asBroadcastStream();
     donationTableUpdates = donationTableUpdateStream
@@ -72,7 +73,7 @@ class NhostService {
       return itemsAsMap.map((x) => Donation.fromMap(x!)).toList();
     });
 
-    final Stream<QueryResult> usageTableUpdateStream = client
+    final usageTableUpdateStream = client
         .subscribe(SubscriptionOptions(document: usageDoc))
         .asBroadcastStream();
     usageTableUpdates = usageTableUpdateStream

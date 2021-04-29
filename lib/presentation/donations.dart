@@ -1,9 +1,11 @@
-import 'package:donation_tracker/constants.dart';
-import 'package:donation_tracker/donation_manager.dart';
-import 'package:donation_tracker/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 
+import '../constants.dart';
+import '../donation_manager.dart';
+import '../utils.dart';
+
+// ignore: use_key_in_widget_constructors
 class Donations extends StatelessWidget with GetItMixin {
   @override
   Widget build(BuildContext context) {
@@ -24,14 +26,14 @@ class Donations extends StatelessWidget with GetItMixin {
                 .cast<DataRow>()
                 .toList(),
             columns: [
-              DataColumn(
-                label: const Text('Name', style: tableHeaderStyle),
+              const DataColumn(
+                label: Text('Name', style: tableHeaderStyle),
               ),
-              DataColumn(
-                label: const Text('Date', style: tableHeaderStyle),
+              const DataColumn(
+                label: Text('Date', style: tableHeaderStyle),
               ),
-              DataColumn(
-                label: const Text('Amount', style: tableHeaderStyle),
+              const DataColumn(
+                label: Text('Amount', style: tableHeaderStyle),
               ),
             ],
           ),

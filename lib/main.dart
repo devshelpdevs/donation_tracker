@@ -1,15 +1,16 @@
-import 'package:donation_tracker/constants.dart';
-import 'package:donation_tracker/donation_manager.dart';
-import 'package:donation_tracker/presentation/donations.dart';
-import 'package:donation_tracker/presentation/usage.dart';
-import 'package:donation_tracker/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
+import 'package:layout/layout.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'constants.dart';
+import 'donation_manager.dart';
 import 'nhost_service.dart';
+import 'presentation/donations.dart';
+import 'presentation/usage.dart';
+import 'utils.dart';
 
 void main() {
   GetIt.I.registerSingleton(NhostService());
@@ -18,22 +19,26 @@ void main() {
   runApp(MyApp());
 }
 
+// ignore: use_key_in_widget_constructors
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Usage overview of DevsHelpDevs\'donations',
-      theme: ThemeData(
-        scaffoldBackgroundColor: backgroundColor,
-        brightness: Brightness.dark,
-        primarySwatch: Colors.blue,
+    return Layout(
+      child: MaterialApp(
+        title: 'Usage overview of DevsHelpDevs\'donations',
+        theme: ThemeData(
+          scaffoldBackgroundColor: backgroundColor,
+          brightness: Brightness.dark,
+          primarySwatch: Colors.blue,
+        ),
+        home: MyHomePage(),
       ),
-      home: MyHomePage(),
     );
   }
 }
 
+// ignore: use_key_in_widget_constructors
 class MyHomePage extends StatefulWidget with GetItStatefulWidgetMixin {
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -59,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage>
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _Header(),
-              SizedBox(
+              const SizedBox(
                 height: 8,
               ),
               TabBar(tabs: [
@@ -124,53 +129,57 @@ class _Header extends StatelessWidget with GetItMixin {
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkWell(
-                      onTap: () async {
-                        await launch('https://www.devshelpdevs.org');
-                      },
-                      child: SvgPicture.asset(
-                        'assets/images/devshelpdevs-logo.svg',
-                        height: 100,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 0),
-                      child: TextButton(
-                        onPressed: () async {
-                          await launch('https://paypal.me/pools/c/8xPwkVP3th');
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () async {
+                          await launch('https://www.devshelpdevs.org');
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 8.0, top: 8, right: 8, bottom: 9),
-                          child: Text(
-                            'Donate here',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline5!
-                                .copyWith(color: Colors.white),
+                        child: SvgPicture.asset(
+                          'assets/images/devshelpdevs-logo.svg',
+                          height: 100,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 0),
+                        child: TextButton(
+                          onPressed: () async {
+                            await launch(
+                                'https://paypal.me/pools/c/8xPwkVP3th');
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 8.0, top: 8, right: 8, bottom: 9),
+                            child: Text(
+                              'Donate here',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .copyWith(color: Colors.white),
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: const Color(0xff115FA7),
+                            side: const BorderSide(
+                                color: Color(0xff115FA7), width: 3),
+                            shape: const StadiumBorder(),
                           ),
                         ),
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: const Color(0xff115FA7),
-                          side: BorderSide(
-                              color: const Color(0xff115FA7), width: 3),
-                          shape: StadiumBorder(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Text(
+                          'Donation Tracker',
+                          style: Theme.of(context).textTheme.headline4,
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Text(
-                        'Donation Tracker',
-                        style: Theme.of(context).textTheme.headline4,
-                      ),
-                    ),
-                    SizedBox(),
-                  ],
+                      const SizedBox(),
+                    ],
+                  ),
                 ),
               ),
               _TotalLine(

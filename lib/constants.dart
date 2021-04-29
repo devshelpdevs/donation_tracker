@@ -10,25 +10,25 @@ Color kColorFromHex(String color) {
   return Color(int.parse(hexColorTrim, radix: 16));
 }
 
-final tableDonations = 'temp_money_donations';
-final tableUsages = 'temp_money_used_for';
+const tableDonations = 'temp_money_donations';
+const tableUsages = 'temp_money_used_for';
 final backgroundColor = kColorFromHex('#14142B');
 final primaryColor = kColorFromHex('#115FA7');
 
 const tableHeaderStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
 
 const server =
-    const String.fromEnvironment('SERVER', defaultValue: '3fad0791.nhost.app');
+    String.fromEnvironment('SERVER', defaultValue: '3fad0791.nhost.app');
 
-const hasuraSecret = const String.fromEnvironment('HASURA_SECRET');
-const userID = const String.fromEnvironment('USER_ID');
-const authPassword = const String.fromEnvironment('AUTH_PASSWORD');
+const hasuraSecret = String.fromEnvironment('HASURA_SECRET');
+const userID = String.fromEnvironment('USER_ID');
+const authPassword = String.fromEnvironment('AUTH_PASSWORD');
 
 const graphQlEndPoint = 'hasura-$server/v1/graphql';
 
 final WebSocketLink _socketLink = WebSocketLink(
   'wss://$graphQlEndPoint',
-  config: SocketClientConfig(
+  config: const SocketClientConfig(
     autoReconnect: true,
     inactivityTimeout: Duration(seconds: 30),
   ),
@@ -42,7 +42,7 @@ final _link =
 final client = ValueNotifier<GraphQLClient>(
     GraphQLClient(link: _link, cache: GraphQLCache()));
 
-String getDonation = """
+String getDonation = '''
   subscription GetDonation {
     $tableDonations(order_by: {donation_date: desc}) {
       created_at
@@ -53,9 +53,9 @@ String getDonation = """
       donation_date
     }
   }
-""";
+''';
 
-String getUsage = """
+String getUsage = '''
   subscription GetUsage {
     $tableUsages(order_by: {usage_date: desc}) {
       created_at
@@ -67,4 +67,10 @@ String getUsage = """
       usage_date
     }
   }
-""";
+''';
+
+// xs: 0 – 599
+// sm: 600 – 1023
+// md: 1024 – 1439
+// lg: 1440 – 1919
+// xl: 1920 +

@@ -1,4 +1,5 @@
-///We use the same table for already used money as well as for people waiting for help
+///We use the same table for already used money
+///as well as for people waiting for help
 /// if [date] is null it means that this is a waiting entry
 class Usage {
   const Usage(
@@ -23,6 +24,7 @@ class Usage {
 
   @override
   String toString() {
-    return 'Usage{id: $id, whatFor: $whatFor, amount: $amount, createdAt: $date}';
+    return '''Usage{id: $id, whatFor: $whatFor,'''
+        '''amount: $amount, createdAt: $date}''';
   }
 }

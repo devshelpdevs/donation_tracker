@@ -1,8 +1,9 @@
-import 'package:donation_tracker/models/donation.dart';
-import 'package:donation_tracker/models/usage.dart';
-import 'package:donation_tracker/nhost_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
+
+import 'models/donation.dart';
+import 'models/usage.dart';
+import 'nhost_service.dart';
 
 class DonationManager {
   final loading = ValueNotifier(false);
@@ -26,7 +27,8 @@ class DonationManager {
     });
 
     nhostService.usageTableUpdates.listen((list) {
-      /// We are using the same table for already used donations and for causes waiting
+      /// We are using the same table for already
+      ///  used donations and for causes waiting
       final used = list.where((x) => !x.isWaitingCause);
       final waiting = list.where((x) => x.isWaitingCause);
 
@@ -40,7 +42,8 @@ class DonationManager {
     });
 
     nhostService.errorUpdates.listen((event) {
-      /// This might be a bit brutal in case there is an error but I don't expect many to happen :-)
+      /// This might be a bit brutal in case there is
+      ///  an error but I don't expect many to happen :-)
       error.value = event.toString();
     });
   }

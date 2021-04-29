@@ -1,15 +1,18 @@
 import 'package:graphql/client.dart';
 
-main() async {
-  final HttpLink httpLink = HttpLink(
+void main() async {
+  final httpLink = HttpLink(
     'https://hasura-3fad0791.nhost.app/v1/graphql',
   );
-  final _authLink = AuthLink(getToken: () {
-    return '06b94e1e71388f27e6ab5c5af4c87249';
-  }, headerKey: 'x-hasura-admin-secret');
-  final client = GraphQLClient(link: _authLink.concat(httpLink), cache: GraphQLCache());
+  final _authLink = AuthLink(
+      getToken: () {
+        return '06b94e1e71388f27e6ab5c5af4c87249';
+      },
+      headerKey: 'x-hasura-admin-secret');
+  final client =
+      GraphQLClient(link: _authLink.concat(httpLink), cache: GraphQLCache());
 
-  String readRepositories = """
+  const readRepositories = '''
   subscription GetDonation {
     temp_money_donations {
       created_at
@@ -31,8 +34,9 @@ main() async {
       value
     }
   }
-""";
-  final results = await client.query(QueryOptions(document: gql(readRepositories), variables: {}));
+''';
+  final results = await client
+      .query(QueryOptions(document: gql(readRepositories), variables: {}));
   if (results.hasException) {
     print(results.exception.toString());
   }
