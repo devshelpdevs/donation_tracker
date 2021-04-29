@@ -42,7 +42,7 @@ class NhostService {
 
   String getUsage = """
   subscription GetUsage {
-    $tableUsages(order_by: {usage_date: desc}) {
+    $tableUsages(order_by: {usage_date: desc, created_at:asc}) {
       created_at
       id
       storage_image_name
@@ -50,6 +50,8 @@ class NhostService {
       usage
       value
       usage_date
+      receivers_name 
+      storage_image_name_person
     }
   }
 """;

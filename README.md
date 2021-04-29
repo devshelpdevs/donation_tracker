@@ -1,3 +1,4 @@
+This is the repository for the DevsHelpDevs Donation Tracker Flutter Web app https://helpdevs-tracker.netlify.app
 # donation_tracker
 
 Because I get regularly requests for help for repairs or updates and I don't want to wait to have the DevsHelpDevs platform finished, Jimmy and I developed this flutter web app to allow me to track and show all donations usages and waiting people.
