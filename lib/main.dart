@@ -13,6 +13,7 @@ import 'nhost_service.dart';
 
 void main() {
   GetIt.I.registerSingleton(NhostService());
+  GetIt.I<NhostService>().startGraphQlSubscriptions();
   GetIt.I.registerSingleton(DonationManager());
 
   runApp(MyApp());
@@ -46,53 +47,63 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   Widget build(BuildContext context) {
+    final isReady = allReady();
+
     final numDonations =
         watchX((DonationManager m) => m.donationUpdates).length;
     final numUsed = watchX((DonationManager m) => m.usageUpdates).length;
     final numWait = watchX((DonationManager m) => m.waitingUpdates).length;
+
     return Scaffold(
       body: SafeArea(
-        child: Container(
-          color: backgroundColor,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _Header(),
-              SizedBox(
-                height: 8,
-              ),
-              TabBar(tabs: [
-                Tab(
-                  child: Text(
-                      'Received Donations'.toUpperCase() + ' ($numDonations)'),
-                ),
-                Tab(
-                  child: Text('Used for'.toUpperCase() + ' ($numUsed)'),
-                ),
-                Tab(
-                  child: Text('Waiting for Help'.toUpperCase() + ' ($numWait)'),
-                )
-              ], controller: controller),
-              Expanded(
-                child: TabBarView(
-                  controller: controller,
+        child: isReady
+            ? Container(
+                color: backgroundColor,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Donations(),
-                    DonationUsages(
-                      usageUpdates: GetIt.I<DonationManager>().usageUpdates,
-                      hasUsageDates: true,
+                    _Header(),
+                    SizedBox(
+                      height: 8,
                     ),
-                    DonationUsages(
-                      usageUpdates: GetIt.I<DonationManager>().waitingUpdates,
-                      hasUsageDates: false,
+                    TabBar(tabs: [
+                      Tab(
+                        child: Text('Received Donations'.toUpperCase() +
+                            ' ($numDonations)'),
+                      ),
+                      Tab(
+                        child: Text('Used for'.toUpperCase() + ' ($numUsed)'),
+                      ),
+                      Tab(
+                        child: Text(
+                            'Waiting for Help'.toUpperCase() + ' ($numWait)'),
+                      )
+                    ], controller: controller),
+                    Expanded(
+                      child: TabBarView(
+                        controller: controller,
+                        children: [
+                          Donations(),
+                          DonationUsages(
+                            usageUpdates:
+                                GetIt.I<DonationManager>().usageUpdates,
+                            hasUsageDates: true,
+                          ),
+                          DonationUsages(
+                            usageUpdates:
+                                GetIt.I<DonationManager>().waitingUpdates,
+                            hasUsageDates: false,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
+              )
+            : Center(
+                child: CircularProgressIndicator(),
               ),
-            ],
-          ),
-        ),
       ),
     );
   }

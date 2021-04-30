@@ -23,4 +23,6 @@ const hasuraSecret = const String.fromEnvironment('HASURA_SECRET');
 const userID = const String.fromEnvironment('USER_ID');
 const authPassword = const String.fromEnvironment('AUTH_PASSWORD');
 
-const graphQlEndPoint = 'hasura-$server/v1/graphql';
+const graphQlEndPoint = 'https://hasura-$server/v1/graphql';
+
+const nhostBaseUrl = 'https://backend-$server';

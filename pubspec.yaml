@@ -24,11 +24,14 @@ dependencies:
   intl: ^0.17.0
   graphql: 5.0.0-nullsafety.1
   get_it: ^6.0.0
+  flutter_command: any
   get_it_mixin: ^2.0.2
   url_launcher:
   rxdart:
   functional_listener:
   flutter_svg:
+  nhost_sdk: ^1.0.1
+  nhost_graphql_adapter: ^1.0.1
   flutter:
     sdk: flutter
 
@@ -38,7 +41,7 @@ dependencies:
   cupertino_icons: ^1.0.2
 
 dev_dependencies:
-  graphql: 5.0.0-nullsafety.1
+  test:
   flutter_test:
     sdk: flutter
 

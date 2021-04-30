@@ -1,13 +1,23 @@
 class Donation {
-  const Donation(this.id, this.name, this.amount, this.date);
+  const Donation(
+      {this.id,
+      this.name,
+      this.hiddenName,
+      required this.amount,
+      required this.date});
 
   factory Donation.fromMap(Map<String, dynamic> data) {
-    return Donation(data['id'], data['donator'] ?? 'anonymous', data['value'],
-        data['donation_date']);
+    return Donation(
+        id: data['id'],
+        name: data['donator'],
+        hiddenName: data['donator_hidden'],
+        amount: data['value'],
+        date: data['donation_date']);
   }
 
-  final int id;
-  final String name;
+  final int? id;
+  final String? name;
+  final String? hiddenName;
   final int amount;
   final String date;
 

@@ -1,67 +1,36 @@
 import 'package:donation_tracker/constants.dart';
+import 'package:donation_tracker/graphQlRequests.dart';
 import 'package:donation_tracker/models/donation.dart';
 import 'package:donation_tracker/models/usage.dart';
 import 'package:graphql/client.dart';
+import 'package:nhost_graphql_adapter/nhost_graphql_adapter.dart';
+import 'package:nhost_sdk/nhost_sdk.dart';
 import 'package:rxdart/rxdart.dart';
 
 class NhostService {
-  bool get hasWriteAccess => hasuraSecret != '';
+  bool hasWriteAccess = false;
 
-  static const tableDonations = 'temp_money_donations';
-  static const tableUsages = 'temp_money_used_for';
+  late final GraphQLClient client;
 
-  final WebSocketLink _socketLink = WebSocketLink(
-    'wss://hasura-3fad0791.nhost.app/v1/graphql',
-    config: SocketClientConfig(
-      autoReconnect: true,
-      inactivityTimeout: Duration(seconds: 30),
-    ),
-  );
-
-  final HttpLink _httpLink = HttpLink(
-    'https://hasura-3fad0791.nhost.app/v1/graphql',
-  );
-
-  late final _link =
-      Link.split((request) => request.isSubscription, _socketLink, _httpLink);
-
-  late final client = GraphQLClient(link: _link, cache: GraphQLCache());
-
-  String getDonation = """
-  subscription GetDonation {
-    $tableDonations(order_by: {donation_date: desc}) {
-      created_at
-      donator
-      id
-      updated_at
-      value
-      donation_date
-    }
-  }
-""";
-
-  String getUsage = """
-  subscription GetUsage {
-    $tableUsages(order_by: {usage_date: desc, created_at:asc}) {
-      created_at
-      id
-      storage_image_name
-      updated_at
-      usage
-      value
-      usage_date
-      receivers_name 
-      storage_image_name_person
-    }
-  }
-""";
+  final nhostClient = NhostClient(baseUrl: nhostBaseUrl);
 
   late Stream<List<Donation>> donationTableUpdates;
   late Stream<List<Usage>> usageTableUpdates;
   late Stream<OperationException> errorUpdates;
 
+  /// for testing we can pass in optional adminSecret and graphQL Endpoint
+  /// will be otherwise retrieved via `fromEnvironment`
   NhostService() {
-    final donationDoc = gql(getDonation);
+    client = createNhostGraphQLClient(graphQlEndPoint, nhostClient);
+  }
+
+  void startGraphQlSubscriptions() {
+    /// unless you are not logged in, not all properties are acessible
+    /// That's why we have to use differen't gql requests
+    final donationDoc = gql(
+        nhostClient.auth.authenticationState != AuthenticationState.loggedIn
+            ? getDonation
+            : getDonationLoggedIn);
     final usageDoc = gql(getUsage);
 
     final Stream<QueryResult> donationTableUpdateStream = client
@@ -88,5 +57,36 @@ class NhostService {
         .mergeWith([donationTableUpdateStream])
         .where((event) => event.hasException)
         .map((event) => event.exception!);
+
+    errorUpdates.listen((event) {
+      print(event.toString());
+    });
+  }
+
+  Future addDonation(Donation donation) async {
+    final options = MutationOptions(document: gql(insertDonation), variables: {
+      'donator': donation.name,
+      'value': donation.amount,
+      'donation_date': donation.date,
+      'donator_hidden': donation.hiddenName
+    });
+
+    final result = await client.mutate(options);
+
+    if (result.hasException) {
+      throw result.exception!;
+    }
+  }
+
+  Future<bool> loginUser(String userName, String pwd) async {
+    try {
+      await nhostClient.auth.login(
+        email: userName,
+        password: pwd,
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

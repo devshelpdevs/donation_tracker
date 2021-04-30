@@ -13,19 +13,35 @@
                 "SERVER=3fad0791.nhost.app",
             ]
         },
-                {
+        {
             "name": "donation_tracker_staging_write_access",
             "request": "launch",
             "type": "dart",
             "args": [
                 "--dart-define",
                 "SERVER=63b34375.nhost.app",
+            ]
+        },
+        {
+            "name": "run tests on staging",
+            "type": "dart",
+            "request": "launch",
+            "codeLens": {
+                // Types of CodeLens to inject
+                "for": [
+                    "run-test",
+                    "run-test-file",
+                    "debug-test",
+                    "debug-test-file"
+                ],
+                // Restrict to certain folders
+                "path": "test",
+                // Text for CodeLens link (${debugType} will be replaced with "run" or "debug")
+                "title": "${debugType} (onStaging)"
+            },
+            "args": [
                 "--dart-define",
-                "HASURA_SECRET=4bd0efc0d8ba8636fd63b3ab25f35c56",
-                "--dart-define",
-                "USER_ID=e79ea538-7b5d-4854-8acd-a284c1923209",
-                "--dart-define",
-                "AUTH_PASSWORD=uZKFT5QU5eaEmk",
+                "SERVER=63b34375.nhost.app",
             ]
         }
     ]

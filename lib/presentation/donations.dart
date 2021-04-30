@@ -16,7 +16,7 @@ class Donations extends StatelessWidget with GetItMixin {
             rows: donations
                 .map((data) {
                   return DataRow(cells: [
-                    DataCell(Text(data.name)),
+                    DataCell(Text(data.name ?? 'anonymous')),
                     DataCell(Text(data.date.toDateTime().format())),
                     DataCell(Text(data.amount.toCurrency())),
                   ]);
