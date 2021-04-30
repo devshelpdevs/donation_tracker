@@ -18,10 +18,20 @@ class NhostService {
   late Stream<List<Usage>> usageTableUpdates;
   late Stream<OperationException> errorUpdates;
 
-  /// for testing we can pass in optional adminSecret and graphQL Endpoint
-  /// will be otherwise retrieved via `fromEnvironment`
   NhostService() {
     client = createNhostGraphQLClient(graphQlEndPoint, nhostClient);
+  }
+
+  Future<bool> loginUser(String userName, String pwd) async {
+    try {
+      await nhostClient.auth.login(
+        email: userName,
+        password: pwd,
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   void startGraphQlSubscriptions() {
@@ -75,18 +85,6 @@ class NhostService {
 
     if (result.hasException) {
       throw result.exception!;
-    }
-  }
-
-  Future<bool> loginUser(String userName, String pwd) async {
-    try {
-      await nhostClient.auth.login(
-        email: userName,
-        password: pwd,
-      );
-      return true;
-    } catch (e) {
-      return false;
     }
   }
 }
