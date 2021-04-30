@@ -9,18 +9,18 @@ As it turned out that I will need to use this app more than originally thought a
 ## Possible configurations
 
 To allow adding editing features in a safe way I set up a separate staging backend on Nhost which can be used by everyone for developing.
-To keep things simple, we won't add full user management. To allow write access to the database the app will get past in the admin secret is environment variable during build. If no admin secret is provided the app won't have write access and won't display any editing features. The admin secret of the production database won't be included in the github repository but I can build a local desktop versions for myself using the correct key. The admin secret for the staging environment will be included in the debug configuration.
 
-Environment variables that can be passed in:
+To select the staging backend you have to pass in the server it should use:
 
 ```
 --dart-define SERVER=63b34375.nhost.app
---dart-define HASURA_SECRET=4bd0efc0d8ba8636fd63b3ab25f35c56
---dart-define USER_ID=e79ea538-7b5d-4854-8acd-a284c1923209
---dart-define AUTH_PASSWORD=uZKFT5QU5eaEmk
 ```
 
-only if you pass in the last three you will be able to modify the data content.
+To be able to make mutation to data you have to log-in:
+
+```dart
+    await server.loginUser('mail@devshelpdevs.org', 'staging');
+```
 
 For VS code I included 2 different run configurations to switch between read only production database and write access staging server.
 If you don't provide any environment variable the app defaults to read only production server.

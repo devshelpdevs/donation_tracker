@@ -1,4 +1,4 @@
-const String getDonation = """
+const String getDonationRequest = """
   subscription {
     temp_money_donations(order_by: {donation_date: desc}) {
       donator
@@ -7,9 +7,9 @@ const String getDonation = """
       donation_date
     }
   }
-
 """;
-const String getDonationLoggedIn = """
+
+const String getDonationLoggedInRequest = """
   subscription{ 
     temp_money_donations(order_by: {donation_date: desc}) {
       created_at
@@ -21,10 +21,9 @@ const String getDonationLoggedIn = """
       donator_hidden
     }
   }
-
 """;
 
-const String insertDonation = r"""
+const String insertDonationRequest = r"""
 mutation ($donator: String, $donator_hidden: String, $value: Int!, $donation_date: timestamp!) {
   insert_temp_money_donations(objects: {donation_date: $donation_date, donator: $donator, donator_hidden: $donator_hidden, value: $value}) {
     returning {
@@ -32,6 +31,17 @@ mutation ($donator: String, $donator_hidden: String, $value: Int!, $donation_dat
     }
   }
 }
+""";
+
+const String deleteDonationRequest = r"""
+mutation ($id: Int!) {
+  delete_temp_money_donations_by_pk(id: $id) {
+    id
+  }
+}
+""";
+
+const String updateDonationRequest = r"""
 
 """;
 

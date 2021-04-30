@@ -29,6 +29,7 @@ dependencies:
   url_launcher:
   rxdart:
   functional_listener:
+  deep_pick: ^0.8.0
   flutter_svg:
   nhost_sdk: ^1.0.1
   nhost_graphql_adapter: ^1.0.1

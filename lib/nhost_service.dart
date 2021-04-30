@@ -1,3 +1,4 @@
+import 'package:deep_pick/deep_pick.dart';
 import 'package:donation_tracker/constants.dart';
 import 'package:donation_tracker/graphQlRequests.dart';
 import 'package:donation_tracker/models/donation.dart';
@@ -8,7 +9,8 @@ import 'package:nhost_sdk/nhost_sdk.dart';
 import 'package:rxdart/rxdart.dart';
 
 class NhostService {
-  bool hasWriteAccess = false;
+  bool get hasWriteAccess =>
+      nhostClient.auth.authenticationState == AuthenticationState.loggedIn;
 
   late final GraphQLClient client;
 
@@ -37,10 +39,8 @@ class NhostService {
   void startGraphQlSubscriptions() {
     /// unless you are not logged in, not all properties are acessible
     /// That's why we have to use differen't gql requests
-    final donationDoc = gql(
-        nhostClient.auth.authenticationState != AuthenticationState.loggedIn
-            ? getDonation
-            : getDonationLoggedIn);
+    final donationDoc =
+        gql(hasWriteAccess ? getDonationLoggedInRequest : getDonationRequest);
     final usageDoc = gql(getUsage);
 
     final Stream<QueryResult> donationTableUpdateStream = client
@@ -73,13 +73,34 @@ class NhostService {
     });
   }
 
-  Future addDonation(Donation donation) async {
-    final options = MutationOptions(document: gql(insertDonation), variables: {
-      'donator': donation.name,
-      'value': donation.amount,
-      'donation_date': donation.date,
-      'donator_hidden': donation.hiddenName
-    });
+  Future<int> addDonation(Donation donation) async {
+    final options = MutationOptions(
+      document: gql(insertDonationRequest),
+      variables: {
+        'donator': donation.name,
+        'value': donation.amount,
+        'donation_date': donation.date,
+        'donator_hidden': donation.hiddenName
+      },
+    );
+
+    final result = await client.mutate(options);
+
+    if (result.hasException) {
+      throw result.exception!;
+    }
+    return pick(
+            result.data, 'insert_temp_money_donations', 'returning', 0, 'id')
+        .asIntOrThrow();
+  }
+
+  Future deleteDonation(int id) async {
+    final options = MutationOptions(
+      document: gql(deleteDonationRequest),
+      variables: {
+        'id': id,
+      },
+    );
 
     final result = await client.mutate(options);
 
