@@ -40,8 +40,8 @@ class NhostService {
     /// unless you are not logged in, not all properties are acessible
     /// That's why we have to use differen't gql requests
     final donationDoc =
-        gql(hasWriteAccess ? getDonationLoggedInRequest : getDonationRequest);
-    final usageDoc = gql(getUsage);
+        gql(hasWriteAccess ? getDonationLoggedInRequest : getDonationsRequest);
+    final usageDoc = gql(getUsagesRequest);
 
     final Stream<QueryResult> donationTableUpdateStream = client
         .subscribe(SubscriptionOptions(document: donationDoc))
@@ -73,6 +73,8 @@ class NhostService {
     });
   }
 
+  /// Donation CRUD Operations
+
   Future<int> addDonation(Donation donation) async {
     final options = MutationOptions(
       document: gql(insertDonationRequest),
@@ -94,6 +96,27 @@ class NhostService {
         .asIntOrThrow();
   }
 
+  Future<int> updateDonation(Donation donation) async {
+    final options = MutationOptions(
+      document: gql(updateDonationRequest),
+      variables: {
+        'id': donation.id,
+        'donator': donation.name,
+        'value': donation.amount,
+        'donation_date': donation.date,
+        'donator_hidden': donation.hiddenName
+      },
+    );
+
+    final result = await client.mutate(options);
+
+    if (result.hasException) {
+      throw result.exception!;
+    }
+    return pick(result.data, 'update_temp_money_donations_by_pk', 'id')
+        .asIntOrThrow();
+  }
+
   Future deleteDonation(int id) async {
     final options = MutationOptions(
       document: gql(deleteDonationRequest),
@@ -107,5 +130,111 @@ class NhostService {
     if (result.hasException) {
       throw result.exception!;
     }
+  }
+
+  Future<Donation> getDonation(int id) async {
+    final options = QueryOptions(
+        document: gql(getDonationRequestById),
+        variables: {
+          'id': id,
+        },
+        fetchPolicy: FetchPolicy.networkOnly);
+
+    final result = await client.query(options);
+
+    if (result.hasException) {
+      throw result.exception!;
+    }
+
+    final data = result.data!['temp_money_donations_by_pk'];
+    if (data == null) {
+      throw Exception('Donation Id:$id not found!');
+    }
+    return Donation.fromMap(data);
+  }
+
+  /// Usage CRUD operations
+
+  Future<int> addUsage(Usage usage) async {
+    final options = MutationOptions(
+      document: gql(insertUsageRequest),
+      variables: {
+        'storage_image_name': usage.image,
+        'storage_image_name_person': usage.imageReceiver,
+        'usage': usage.whatFor,
+        'value': usage.amount,
+        'usage_date': usage.date,
+        'receivers_name': usage.name,
+        'receiver_hidden_name': usage.hiddenName
+      },
+    );
+
+    final result = await client.mutate(options);
+
+    if (result.hasException) {
+      throw result.exception!;
+    }
+    return pick(result.data, 'insert_temp_money_used_for_one', 'id')
+        .asIntOrThrow();
+  }
+
+  Future<int> updateUsage(Usage usage) async {
+    final options = MutationOptions(
+      document: gql(updateUsageRequest),
+      variables: {
+        'id': usage.id,
+        'storage_image_name': usage.image,
+        'storage_image_name_person': usage.imageReceiver,
+        'usage': usage.whatFor,
+        'value': usage.amount,
+        'usage_date': usage.date,
+        'receivers_name': usage.name,
+        'receiver_hidden_name': usage.hiddenName
+      },
+    );
+
+    final result = await client.mutate(options);
+
+    if (result.hasException) {
+      throw result.exception!;
+    }
+    return pick(result.data, 'update_temp_money_used_for_by_pk', 'id')
+        .asIntOrThrow();
+  }
+
+  Future deleteUsage(int id) async {
+    final options = MutationOptions(
+      document: gql(deleteUsageRequest),
+      variables: {
+        'id': id,
+      },
+    );
+
+    final result = await client.mutate(options);
+
+    if (result.hasException) {
+      throw result.exception!;
+    }
+  }
+
+  Future<Usage> getUsage(int id) async {
+    final options = QueryOptions(
+        document: gql(getUsageRequestById),
+        variables: {
+          'id': id,
+        },
+        fetchPolicy: FetchPolicy.networkOnly);
+
+    final result = await client.query(options);
+
+    if (result.hasException) {
+      throw result.exception!;
+    }
+
+    var data = result.data!['temp_money_used_for_by_pk'];
+    if (data == null) {
+      throw Exception('Usage Id:$id not found!');
+    }
+    return Usage.fromMap(data);
   }
 }

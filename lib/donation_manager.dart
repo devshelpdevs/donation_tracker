@@ -2,6 +2,7 @@ import 'package:donation_tracker/models/donation.dart';
 import 'package:donation_tracker/models/usage.dart';
 import 'package:donation_tracker/nhost_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_command/flutter_command.dart';
 import 'package:get_it/get_it.dart';
 
 class DonationManager {
@@ -14,8 +15,13 @@ class DonationManager {
   final donationUpdates = ValueNotifier(<Donation>[]);
   final usageUpdates = ValueNotifier<List<Usage>>([]);
   final waitingUpdates = ValueNotifier<List<Usage>>([]);
+  late final Command<Donation, void> upsertDonation;
 
   DonationManager() {
+    startDatabaseListeners();
+  }
+
+  void startDatabaseListeners() {
     final nhostService = GetIt.I<NhostService>();
 
     nhostService.donationTableUpdates.listen((list) {
