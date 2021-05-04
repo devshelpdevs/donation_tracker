@@ -118,12 +118,13 @@ class NhostService {
         .asIntOrThrow();
   }
 
-  Future deleteDonation(int id) async {
+  Future deleteDonation(Donation donation) async {
     assert(hasWriteAccess, 'Your aren\'t logged in! This shouldn be possible');
+    assert(donation.id != null);
     final options = MutationOptions(
       document: gql(deleteDonationRequest),
       variables: {
-        'id': id,
+        'id': donation.id!,
       },
     );
 
@@ -206,12 +207,13 @@ class NhostService {
         .asIntOrThrow();
   }
 
-  Future deleteUsage(int id) async {
+  Future deleteUsage(Usage usage) async {
+    assert(usage.id != null);
     assert(hasWriteAccess, 'Your aren\'t logged in! This shouldn be possible');
     final options = MutationOptions(
       document: gql(deleteUsageRequest),
       variables: {
-        'id': id,
+        'id': usage.id!,
       },
     );
 

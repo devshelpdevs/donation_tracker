@@ -16,16 +16,25 @@ class LoginCredentials {
 }
 
 class AuthenticationManager {
-  late final ValueListenable<void> loginStateChanged;
+  late final ValueListenable<bool> isLoggedIn;
 
-  late final Command<LoginCredentials, void> loginCommand;
-  late final Command<void, void> logoutCommand;
+  late final Command<LoginCredentials, bool> loginCommand;
+  late final Command<void, bool> logoutCommand;
 
   AuthenticationManager() {
-    loginCommand = Command.createAsyncNoResult((x) => loginUser(x.name, x.pwd));
-    logoutCommand = Command.createAsyncNoParamNoResult(() => logout());
+    loginCommand = Command.createAsync((x) async {
+      await loginUser(x!.name, x.pwd);
+      return true;
+    }, false);
+    logoutCommand = Command.createAsyncNoParam(() async {
+      await logout();
+      return false;
+    }, true);
 
-    loginStateChanged = loginCommand.mergeWith([logoutCommand]);
+    isLoggedIn = loginCommand.mergeWith([logoutCommand]);
+    isLoggedIn.listen((loggedInState, _) {
+      print('Logged in? : $loggedInState');
+    });
 
     loginCommand.thrownExceptions.listen((ex, _) => print(ex.toString()));
   }
@@ -35,7 +44,6 @@ class AuthenticationManager {
       GetIt.I.pushNewScope(scopeName: 'logged In');
 
       GetIt.I.registerSingleton(NhostService(true));
-      GetIt.I<NhostService>();
       GetIt.I.registerSingleton<DonationManager>(DonationManagerLoggedIn());
     }
   }

@@ -1,5 +1,6 @@
 import 'package:donation_tracker/_managers/authentication_manager.dart';
 import 'package:donation_tracker/constants.dart';
+import 'package:donation_tracker/presentation/dialogs.dart';
 import 'package:donation_tracker/presentation/donations.dart';
 import 'package:donation_tracker/presentation/usage.dart';
 import 'package:donation_tracker/utils.dart';
@@ -49,8 +50,6 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     final isReady = allReady();
-    watchX((AuthenticationManager m) => m.loginStateChanged);
-    print('Loggin state change');
 
     final numDonations =
         watchX((DonationManager m) => m.donationUpdates).length;
@@ -58,6 +57,26 @@ class _MyHomePageState extends State<MyHomePage>
     final numWait = watchX((DonationManager m) => m.waitingUpdates).length;
 
     return Scaffold(
+      floatingActionButton: controller.index != 2
+          ? FloatingActionButton(
+              backgroundColor: const Color(0xff115FA7),
+              onPressed: () async {
+                switch (controller.index) {
+                  case 0:
+                    await showAddEditDonationDlg(context);
+                    break;
+                  case 0:
+                    await showAddEditUsageDlg(context);
+                    break;
+                  default:
+                    assert(false, 'We should never get here');
+                }
+              },
+              child: Icon(
+                Icons.add,
+                color: Colors.white,
+              ))
+          : null,
       body: SafeArea(
         child: isReady
             ? Container(
@@ -70,19 +89,23 @@ class _MyHomePageState extends State<MyHomePage>
                     SizedBox(
                       height: 8,
                     ),
-                    TabBar(tabs: [
-                      Tab(
-                        child: Text('Received Donations'.toUpperCase() +
-                            ' ($numDonations)'),
-                      ),
-                      Tab(
-                        child: Text('Used for'.toUpperCase() + ' ($numUsed)'),
-                      ),
-                      Tab(
-                        child: Text(
-                            'Waiting for Help'.toUpperCase() + ' ($numWait)'),
-                      )
-                    ], controller: controller),
+                    TabBar(
+                        onTap: (index) => setState(() {}),
+                        tabs: [
+                          Tab(
+                            child: Text('Received Donations'.toUpperCase() +
+                                ' ($numDonations)'),
+                          ),
+                          Tab(
+                            child:
+                                Text('Used for'.toUpperCase() + ' ($numUsed)'),
+                          ),
+                          Tab(
+                            child: Text('Waiting for Help'.toUpperCase() +
+                                ' ($numWait)'),
+                          )
+                        ],
+                        controller: controller),
                     Expanded(
                       child: TabBarView(
                         controller: controller,
@@ -123,6 +146,9 @@ class _Header extends StatelessWidget with GetItMixin {
 
   @override
   Widget build(BuildContext context) {
+    final loggedIn = watchX((AuthenticationManager m) => m.isLoggedIn);
+    print(loggedIn ? 'Logged in' : 'logged out');
+
     final totalDonated = watchX((DonationManager m) => m.totalDonated);
     final totalUsed = watchX((DonationManager m) => m.totalUsed);
     final totalWaiting = watchX((DonationManager m) => m.totalWaiting);
@@ -156,17 +182,46 @@ class _Header extends StatelessWidget with GetItMixin {
                         height: 100,
                       ),
                     ),
+                    TextButton(
+                      onPressed: () async {
+                        await launch('https://paypal.me/pools/c/8xPwkVP3th');
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 8.0, top: 8, right: 8, bottom: 9),
+                        child: Text(
+                          'Donate here',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headline5!
+                              .copyWith(color: Colors.white),
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: const Color(0xff115FA7),
+                        side: BorderSide(
+                            color: const Color(0xff115FA7), width: 3),
+                        shape: StadiumBorder(),
+                      ),
+                    ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 0),
-                      child: TextButton(
-                        onPressed: () async {
-                          await launch('https://paypal.me/pools/c/8xPwkVP3th');
+                      padding: const EdgeInsets.all(24.0),
+                      child: Text(
+                        'Donation Tracker',
+                        style: Theme.of(context).textTheme.headline4,
+                      ),
+                    ),
+                    SizedBox(),
+                    if (loggedIn)
+                      TextButton(
+                        onPressed: () {
+                          get<AuthenticationManager>().logoutCommand();
                         },
                         child: Padding(
                           padding: const EdgeInsets.only(
                               left: 8.0, top: 8, right: 8, bottom: 9),
                           child: Text(
-                            'Donate here',
+                            'Log out',
                             style: Theme.of(context)
                                 .textTheme
                                 .headline5!
@@ -180,15 +235,6 @@ class _Header extends StatelessWidget with GetItMixin {
                           shape: StadiumBorder(),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Text(
-                        'Donation Tracker',
-                        style: Theme.of(context).textTheme.headline4,
-                      ),
-                    ),
-                    SizedBox(),
                   ],
                 ),
               ),

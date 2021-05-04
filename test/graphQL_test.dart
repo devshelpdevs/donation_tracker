@@ -23,7 +23,7 @@ main() {
         amount: 42, date: DateTime.now().toIso8601String(), name: 'TestUser'));
     final donation = await server.getDonation(id);
     expect(donation.amount, 42);
-    await server.deleteDonation(id);
+    await server.deleteDonation(donation);
   });
 
   test(' Update Donation', () async {
@@ -38,12 +38,14 @@ main() {
 
     final readBackDonation = await server.getDonation(id);
     expect(readBackDonation.amount, 4711);
-    await server.deleteDonation(id);
+    await server.deleteDonation(readBackDonation);
   });
 
   test('Delete Donation not logged in', () async {
     final server = NhostService();
-    expectLater(() async => await server.deleteDonation(33),
+    expectLater(
+        () async => await server
+            .deleteDonation(Donation(id: 33, amount: 10, date: "no date")),
         throwsA(isA<OperationException>()));
   });
 
@@ -52,7 +54,8 @@ main() {
     await server.loginUser('mail@devshelpdevs.org', 'staging');
     int id = await server.addDonation(Donation(
         amount: 42, date: DateTime.now().toIso8601String(), name: 'TestUser'));
-    await server.deleteDonation(id);
+    final readBackDonation = await server.getDonation(id);
+    await server.deleteDonation(readBackDonation);
     expectLater(
         () async => await server.getDonation(id), throwsA(isA<Exception>()));
   });
@@ -68,7 +71,7 @@ main() {
         whatFor: 'Test usage'));
     final donation = await server.getUsage(id);
     expect(donation.amount, 42);
-    await server.deleteUsage(id);
+    await server.deleteUsage(donation);
   });
 
   test(' Update Usage', () async {
@@ -86,12 +89,14 @@ main() {
 
     final readBackUsage = await server.getUsage(id);
     expect(readBackUsage.amount, 4711);
-    await server.deleteUsage(id);
+    await server.deleteUsage(readBackUsage);
   });
 
   test('Delete Usage not logged in', () async {
     final server = NhostService();
-    expectLater(() async => await server.deleteUsage(33),
+    expectLater(
+        () async =>
+            await server.deleteUsage(Usage(whatFor: 'Test', amount: 21)),
         throwsA(isA<OperationException>()));
   });
 
@@ -103,7 +108,8 @@ main() {
         amount: 42,
         date: DateTime.now().toIso8601String(),
         name: 'TestUser'));
-    await server.deleteUsage(id);
+    final readBackUsage = await server.getUsage(id);
+    await server.deleteUsage(readBackUsage);
     expectLater(
         () async => await server.getUsage(id), throwsA(isA<Exception>()));
   });

@@ -18,10 +18,10 @@ class DonationManager implements ShadowChangeHandlers {
   final usageUpdates = ValueNotifier<List<Usage>>([]);
   final waitingUpdates = ValueNotifier<List<Usage>>([]);
 
-  Command<Donation, void>? upsertDonation;
-  Command<Donation, void>? deleteDonation;
-  Command<Usage, void>? updateUsage;
-  Command<Usage, void>? deleteUsage;
+  Command<Donation, bool>? upsertDonation;
+  Command<Donation, bool>? deleteDonation;
+  Command<Usage, bool>? upsertUsage;
+  Command<Usage, bool>? deleteUsage;
 
   late StreamSubscription donationSubscription;
   late StreamSubscription usageSubscription;
