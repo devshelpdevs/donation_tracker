@@ -36,12 +36,10 @@ class Usage {
   final String? hiddenName;
   final String? image;
   final String? imageReceiver;
-  String? get imageLink => image == null
-      ? null
-      : 'https://backend-$nhostBaseUrl/storage/o/public/$image';
-  String? get imageReceiverLink => image == null
-      ? null
-      : 'https://backend-$nhostBaseUrl/storage/o/public/$imageReceiver';
+  String? get imageLink =>
+      image == null ? null : '$nhostBaseUrl/storage/o/public/$image';
+  String? get imageReceiverLink =>
+      image == null ? null : '$nhostBaseUrl/storage/o/public/$imageReceiver';
 
   Usage copyWith({
     int? id,

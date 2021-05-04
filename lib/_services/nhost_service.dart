@@ -9,19 +9,17 @@ import 'package:nhost_sdk/nhost_sdk.dart';
 import 'package:rxdart/rxdart.dart';
 
 class NhostService {
-  bool get hasWriteAccess =>
-      nhostClient.auth.authenticationState == AuthenticationState.loggedIn;
-
   late final GraphQLClient client;
-
-  final nhostClient = NhostClient(baseUrl: nhostBaseUrl);
+  final bool hasWriteAccess;
+  static final nhostClient = NhostClient(baseUrl: nhostBaseUrl);
 
   late Stream<List<Donation>> donationTableUpdates;
   late Stream<List<Usage>> usageTableUpdates;
   late Stream<OperationException> errorUpdates;
 
-  NhostService() {
+  NhostService([this.hasWriteAccess = false]) {
     client = createNhostGraphQLClient(graphQlEndPoint, nhostClient);
+    startGraphQlSubscriptions();
   }
 
   Future<bool> loginUser(String userName, String pwd) async {
@@ -46,6 +44,7 @@ class NhostService {
     final Stream<QueryResult> donationTableUpdateStream = client
         .subscribe(SubscriptionOptions(document: donationDoc))
         .asBroadcastStream();
+
     donationTableUpdates = donationTableUpdateStream
         .where((event) => (!event.hasException) && (event.data != null))
         .map((event) {
@@ -76,6 +75,7 @@ class NhostService {
   /// Donation CRUD Operations
 
   Future<int> addDonation(Donation donation) async {
+    assert(hasWriteAccess, 'Your aren\'t logged in! This shouldn be possible');
     final options = MutationOptions(
       document: gql(insertDonationRequest),
       variables: {
@@ -97,6 +97,7 @@ class NhostService {
   }
 
   Future<int> updateDonation(Donation donation) async {
+    assert(hasWriteAccess, 'Your aren\'t logged in! This shouldn be possible');
     final options = MutationOptions(
       document: gql(updateDonationRequest),
       variables: {
@@ -118,6 +119,7 @@ class NhostService {
   }
 
   Future deleteDonation(int id) async {
+    assert(hasWriteAccess, 'Your aren\'t logged in! This shouldn be possible');
     final options = MutationOptions(
       document: gql(deleteDonationRequest),
       variables: {
@@ -156,6 +158,7 @@ class NhostService {
   /// Usage CRUD operations
 
   Future<int> addUsage(Usage usage) async {
+    assert(hasWriteAccess, 'Your aren\'t logged in! This shouldn be possible');
     final options = MutationOptions(
       document: gql(insertUsageRequest),
       variables: {
@@ -179,6 +182,7 @@ class NhostService {
   }
 
   Future<int> updateUsage(Usage usage) async {
+    assert(hasWriteAccess, 'Your aren\'t logged in! This shouldn be possible');
     final options = MutationOptions(
       document: gql(updateUsageRequest),
       variables: {
@@ -203,6 +207,7 @@ class NhostService {
   }
 
   Future deleteUsage(int id) async {
+    assert(hasWriteAccess, 'Your aren\'t logged in! This shouldn be possible');
     final options = MutationOptions(
       document: gql(deleteUsageRequest),
       variables: {

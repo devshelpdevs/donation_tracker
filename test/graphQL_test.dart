@@ -1,6 +1,6 @@
+import 'package:donation_tracker/_services/nhost_service.dart';
 import 'package:donation_tracker/models/donation.dart';
 import 'package:donation_tracker/models/usage.dart';
-import 'package:donation_tracker/nhost_service.dart';
 import 'package:graphql/client.dart';
 import 'package:test/test.dart';
 

@@ -1,5 +1,5 @@
+import 'package:donation_tracker/_managers/authentication_manager.dart';
 import 'package:donation_tracker/constants.dart';
-import 'package:donation_tracker/donation_manager.dart';
 import 'package:donation_tracker/presentation/donations.dart';
 import 'package:donation_tracker/presentation/usage.dart';
 import 'package:donation_tracker/utils.dart';
@@ -9,11 +9,12 @@ import 'package:get_it/get_it.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'nhost_service.dart';
+import '_managers/donation_manager.dart';
+import '_services/nhost_service.dart';
 
 void main() {
   GetIt.I.registerSingleton(NhostService());
-  GetIt.I<NhostService>().startGraphQlSubscriptions();
+  GetIt.I.registerSingleton(AuthenticationManager());
   GetIt.I.registerSingleton(DonationManager());
 
   runApp(MyApp());
@@ -48,6 +49,8 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     final isReady = allReady();
+    watchX((AuthenticationManager m) => m.loginStateChanged);
+    print('Loggin state change');
 
     final numDonations =
         watchX((DonationManager m) => m.donationUpdates).length;
@@ -140,6 +143,11 @@ class _Header extends StatelessWidget with GetItMixin {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InkWell(
+                      onDoubleTap: () {
+                        get<AuthenticationManager>().loginCommand(
+                            LoginCredentials(
+                                'mail@devshelpdevs.org', 'staging'));
+                      },
                       onTap: () async {
                         await launch('https://www.devshelpdevs.org');
                       },

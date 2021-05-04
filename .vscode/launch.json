@@ -20,6 +20,7 @@
             "args": [
                 "--dart-define",
                 "SERVER=63b34375.nhost.app",
+                "--vmservice-out-file=detective_connect.txt"
             ]
         },
         {

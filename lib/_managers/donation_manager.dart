@@ -1,11 +1,13 @@
+import 'dart:async';
+
+import 'package:donation_tracker/_services/nhost_service.dart';
 import 'package:donation_tracker/models/donation.dart';
 import 'package:donation_tracker/models/usage.dart';
-import 'package:donation_tracker/nhost_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_command/flutter_command.dart';
 import 'package:get_it/get_it.dart';
 
-class DonationManager {
+class DonationManager implements ShadowChangeHandlers {
   final loading = ValueNotifier(false);
   final error = ValueNotifier<String?>(null);
   final totalDonated = ValueNotifier(0);
@@ -15,23 +17,40 @@ class DonationManager {
   final donationUpdates = ValueNotifier(<Donation>[]);
   final usageUpdates = ValueNotifier<List<Usage>>([]);
   final waitingUpdates = ValueNotifier<List<Usage>>([]);
-  late final Command<Donation, void> upsertDonation;
+
+  Command<Donation, void>? upsertDonation;
+  Command<Donation, void>? deleteDonation;
+  Command<Usage, void>? updateUsage;
+  Command<Usage, void>? deleteUsage;
+
+  late StreamSubscription donationSubscription;
+  late StreamSubscription usageSubscription;
+  late StreamSubscription errorSubscription;
 
   DonationManager() {
+    startDatabaseListeners();
+  }
+  @override
+  void onGetShadowed(Object shadowing) {
+    stopListeners();
+  }
+
+  @override
+  void onLeaveShadow(Object shadowing) {
     startDatabaseListeners();
   }
 
   void startDatabaseListeners() {
     final nhostService = GetIt.I<NhostService>();
 
-    nhostService.donationTableUpdates.listen((list) {
+    donationSubscription = nhostService.donationTableUpdates.listen((list) {
       totalDonated.value = list.fold<int>(
           0, (previousValue, element) => previousValue + element.amount);
 
       donationUpdates.value = list;
     });
 
-    nhostService.usageTableUpdates.listen((list) {
+    usageSubscription = nhostService.usageTableUpdates.listen((list) {
       /// We are using the same table for already used donations and for causes waiting
       final used = list.where((x) => !x.isWaitingCause);
       final waiting = list.where((x) => x.isWaitingCause);
@@ -45,9 +64,15 @@ class DonationManager {
       waitingUpdates.value = waiting.toList();
     });
 
-    nhostService.errorUpdates.listen((event) {
+    errorSubscription = nhostService.errorUpdates.listen((event) {
       /// This might be a bit brutal in case there is an error but I don't expect many to happen :-)
       error.value = event.toString();
     });
+  }
+
+  Future<void> stopListeners() async {
+    await donationSubscription.cancel();
+    await usageSubscription.cancel();
+    await errorSubscription.cancel();
   }
 }
