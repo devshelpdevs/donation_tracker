@@ -1,4 +1,6 @@
 import 'package:donation_tracker/_managers/authentication_manager.dart';
+import 'package:donation_tracker/_managers/donation_manager.dart';
+import 'package:donation_tracker/_services/nhost_service.dart';
 import 'package:donation_tracker/constants.dart';
 import 'package:donation_tracker/presentation/dialogs.dart';
 import 'package:donation_tracker/presentation/donations.dart';
@@ -9,9 +11,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '_managers/donation_manager.dart';
-import '_services/nhost_service.dart';
 
 void main() {
   GetIt.I.registerSingleton(NhostService());
@@ -49,6 +48,8 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   Widget build(BuildContext context) {
+    rebuildOnScopeChanges();
+
     final isReady = allReady();
 
     final numDonations =
@@ -146,7 +147,7 @@ class _Header extends StatelessWidget with GetItMixin {
 
   @override
   Widget build(BuildContext context) {
-    final loggedIn = watchX((AuthenticationManager m) => m.isLoggedIn);
+    final loggedIn = get<AuthenticationManager>().isLoggedIn;
     print(loggedIn ? 'Logged in' : 'logged out');
 
     final totalDonated = watchX((DonationManager m) => m.totalDonated);

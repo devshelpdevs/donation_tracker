@@ -23,9 +23,9 @@ environment:
 dependencies:
   intl: ^0.17.0
   graphql: 5.0.0-nullsafety.1
-  get_it: ^7.0.0
+  get_it: ^7.1.2
   flutter_command: any
-  get_it_mixin: 
+  get_it_mixin: ^3.1.0 
   url_launcher:
   rxdart:
   layout:

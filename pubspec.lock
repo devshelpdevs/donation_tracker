@@ -155,7 +155,7 @@ packages:
       name: functional_listener
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "2.0.1"
   gap:
     dependency: transitive
     description:
@@ -169,14 +169,14 @@ packages:
       name: get_it
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "7.0.0"
+    version: "7.1.2"
   get_it_mixin:
     dependency: "direct main"
     description:
       name: get_it_mixin
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.0"
+    version: "3.1.0"
   glob:
     dependency: transitive
     description:

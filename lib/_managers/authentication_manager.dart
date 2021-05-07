@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:donation_tracker/_managers/donation_manager.dart';
 import 'package:donation_tracker/_managers/donation_manager_logged_in.dart';
 import 'package:donation_tracker/_services/nhost_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_command/flutter_command.dart';
 import 'package:functional_listener/functional_listener.dart';
 import 'package:get_it/get_it.dart';
@@ -16,7 +15,7 @@ class LoginCredentials {
 }
 
 class AuthenticationManager {
-  late final ValueListenable<bool> isLoggedIn;
+  bool isLoggedIn = false;
 
   late final Command<LoginCredentials, bool> loginCommand;
   late final Command<void, bool> logoutCommand;
@@ -30,25 +29,23 @@ class AuthenticationManager {
       await logout();
       return false;
     }, true);
-
-    isLoggedIn = loginCommand.mergeWith([logoutCommand]);
-    isLoggedIn.listen((loggedInState, _) {
-      print('Logged in? : $loggedInState');
-    });
-
     loginCommand.thrownExceptions.listen((ex, _) => print(ex.toString()));
   }
 
   Future<void> loginUser(String userName, String pwd) async {
     if (await GetIt.I<NhostService>().loginUser(userName, pwd)) {
-      GetIt.I.pushNewScope(scopeName: 'logged In');
-
-      GetIt.I.registerSingleton(NhostService(true));
-      GetIt.I.registerSingleton<DonationManager>(DonationManagerLoggedIn());
+      isLoggedIn = true;
+      GetIt.I.pushNewScope(
+          scopeName: 'logged In',
+          init: (getIt) {
+            getIt.registerSingleton(NhostService(true));
+            getIt.registerSingleton<DonationManager>(DonationManagerLoggedIn());
+          });
     }
   }
 
   Future<void> logout() async {
+    isLoggedIn = false;
     await GetIt.I.popScope();
   }
 }

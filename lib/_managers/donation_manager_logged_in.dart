@@ -38,7 +38,7 @@ class DonationManagerLoggedIn extends DonationManager implements Disposable {
     }, false);
   }
   @override
-  FutureOr ondDispose() {
+  FutureOr onDispose() {
     stopListeners();
   }
 }
