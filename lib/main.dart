@@ -4,6 +4,7 @@ import 'package:donation_tracker/_services/nhost_service.dart';
 import 'package:donation_tracker/constants.dart';
 import 'package:donation_tracker/presentation/dialogs.dart';
 import 'package:donation_tracker/presentation/donations.dart';
+import 'package:donation_tracker/presentation/select_image_dlg.dart';
 import 'package:donation_tracker/presentation/usage.dart';
 import 'package:donation_tracker/utils.dart';
 import 'package:flutter/material.dart';
@@ -62,13 +63,14 @@ class _MyHomePageState extends State<MyHomePage>
     final numWait = watchX((DonationManager m) => m.waitingUpdates).length;
 
     return Scaffold(
-      floatingActionButton: hasWriteAcess
+      floatingActionButton: true //hasWriteAcess
           ? FloatingActionButton(
               backgroundColor: const Color(0xff115FA7),
               onPressed: () async {
                 switch (controller.index) {
                   case 0:
-                    await showAddEditDonationDlg(context);
+                    await showSelectImageDlg(context);
+                    // await showAddEditDonationDlg(context);
                     break;
                   case 1:
                     await showAddEditUsageDlg(context, waiting: false);

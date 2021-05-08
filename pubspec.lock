@@ -85,6 +85,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
+  cropper:
+    dependency: "direct main"
+    description:
+      name: cropper
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.2"
   cross_file:
     dependency: transitive
     description:

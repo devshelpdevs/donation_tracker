@@ -8,6 +8,13 @@ import 'package:nhost_graphql_adapter/nhost_graphql_adapter.dart';
 import 'package:nhost_sdk/nhost_sdk.dart';
 import 'package:rxdart/rxdart.dart';
 
+class StorageFileInfo {
+  final String fileName;
+
+  String get imageLink => '$nhostBaseUrl/storage/o/public/$fileName';
+  StorageFileInfo(this.fileName);
+}
+
 class NhostService {
   late final GraphQLClient client;
   final bool hasWriteAccess;
@@ -246,5 +253,12 @@ class NhostService {
       throw Exception('Usage Id:$id not found!');
     }
     return Usage.fromMap(data);
+  }
+
+  Future<List<StorageFileInfo>> getAvailableFiles() async {
+    return (await nhostClient.storage.getDirectoryMetadata('public/'))
+        .map((entry) =>
+            StorageFileInfo(entry.key.substring(entry.key.indexOf('/') + 1)))
+        .toList();
   }
 }
