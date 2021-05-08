@@ -15,26 +15,24 @@ class LoginCredentials {
 }
 
 class AuthenticationManager {
-  bool isLoggedIn = false;
+  bool get isLoggedIn => GetIt.I<NhostService>().hasWriteAccess;
 
-  late final Command<LoginCredentials, bool> loginCommand;
-  late final Command<void, bool> logoutCommand;
+  late final Command<LoginCredentials, void> loginCommand;
+  late final Command<void, void> logoutCommand;
 
   AuthenticationManager() {
-    loginCommand = Command.createAsync((x) async {
-      await loginUser(x!.name, x.pwd);
-      return true;
-    }, false);
-    logoutCommand = Command.createAsyncNoParam(() async {
-      await logout();
-      return false;
-    }, true);
+    loginCommand = Command.createAsyncNoResult(
+      (x) async => await loginUser(x.name, x.pwd),
+    );
+    logoutCommand = Command.createAsyncNoParamNoResult(
+      () async => await logout(),
+    );
+
     loginCommand.thrownExceptions.listen((ex, _) => print(ex.toString()));
   }
 
   Future<void> loginUser(String userName, String pwd) async {
     if (await GetIt.I<NhostService>().loginUser(userName, pwd)) {
-      isLoggedIn = true;
       GetIt.I.pushNewScope(
           scopeName: 'logged In',
           init: (getIt) {
@@ -45,7 +43,6 @@ class AuthenticationManager {
   }
 
   Future<void> logout() async {
-    isLoggedIn = false;
     await GetIt.I.popScope();
   }
 }

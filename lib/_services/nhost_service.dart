@@ -18,6 +18,8 @@ class NhostService {
   late Stream<OperationException> errorUpdates;
 
   NhostService([this.hasWriteAccess = false]) {
+    print(nhostBaseUrl);
+    print(server);
     client = createNhostGraphQLClient(graphQlEndPoint, nhostClient);
     startGraphQlSubscriptions();
   }
@@ -30,6 +32,7 @@ class NhostService {
       );
       return true;
     } catch (e) {
+      print(e.toString());
       return false;
     }
   }

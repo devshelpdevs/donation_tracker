@@ -7,6 +7,7 @@ import 'package:donation_tracker/presentation/donations.dart';
 import 'package:donation_tracker/presentation/usage.dart';
 import 'package:donation_tracker/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
@@ -24,14 +25,16 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Usage overview of DevsHelpDevs\'donations',
-      theme: ThemeData(
-        scaffoldBackgroundColor: backgroundColor,
-        brightness: Brightness.dark,
-        primarySwatch: Colors.blue,
+    return ShiftRightFixer(
+      child: MaterialApp(
+        title: 'Usage overview of DevsHelpDevs\'donations',
+        theme: ThemeData(
+          scaffoldBackgroundColor: backgroundColor,
+          brightness: Brightness.dark,
+          primarySwatch: Colors.blue,
+        ),
+        home: MyHomePage(),
       ),
-      home: MyHomePage(),
     );
   }
 }
@@ -49,6 +52,7 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     rebuildOnScopeChanges();
+    final hasWriteAcess = get<NhostService>().hasWriteAccess;
 
     final isReady = allReady();
 
@@ -58,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage>
     final numWait = watchX((DonationManager m) => m.waitingUpdates).length;
 
     return Scaffold(
-      floatingActionButton: controller.index != 2
+      floatingActionButton: controller.index != 2 && hasWriteAcess
           ? FloatingActionButton(
               backgroundColor: const Color(0xff115FA7),
               onPressed: () async {
@@ -148,7 +152,6 @@ class _Header extends StatelessWidget with GetItMixin {
   @override
   Widget build(BuildContext context) {
     final loggedIn = get<AuthenticationManager>().isLoggedIn;
-    print(loggedIn ? 'Logged in' : 'logged out');
 
     final totalDonated = watchX((DonationManager m) => m.totalDonated);
     final totalUsed = watchX((DonationManager m) => m.totalUsed);
@@ -287,6 +290,30 @@ class _TotalLine extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class ShiftRightFixer extends StatefulWidget {
+  ShiftRightFixer({required this.child});
+  final Widget child;
+  @override
+  State<StatefulWidget> createState() => _ShiftRightFixerState();
+}
+
+class _ShiftRightFixerState extends State<ShiftRightFixer> {
+  final FocusNode focus =
+      FocusNode(skipTraversal: true, canRequestFocus: false);
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      focusNode: focus,
+      onKey: (_, RawKeyEvent event) {
+        return event.physicalKey == PhysicalKeyboardKey.shiftRight
+            ? KeyEventResult.handled
+            : KeyEventResult.ignored;
+      },
+      child: widget.child,
     );
   }
 }

@@ -1,8 +1,10 @@
+import 'package:donation_tracker/_managers/donation_manager.dart';
 import 'package:donation_tracker/models/donation.dart';
 import 'package:donation_tracker/models/usage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get_it/get_it.dart';
 import 'package:layout/layout.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -20,51 +22,143 @@ Future<void> showAddEditDonationDlg(BuildContext context,
 
   final form = FormGroup({
     'id': FormControl<int>(value: donation?.id),
-    'name': FormControl<String>(value: donation?.name),
-    'hiddenName': FormControl<String>(value: donation?.hiddenName),
-    'amount': FormControl<double>(value: (donation?.amount ?? 0.0) / 100.0),
-    'date': FormControl<DateTime>(
+    'donator': FormControl<String>(value: donation?.name),
+    'donator_hidden': FormControl<String>(value: donation?.hiddenName),
+    'value': FormControl<double>(
+        value: (donation?.amount ?? 0.0) / 100.0,
+        validators: [Validators.required, Validators.number]),
+    'donation_date': FormControl<DateTime>(
         value: donation?.date != null
             ? DateTime.tryParse(donation!.date)
             : DateTime.now()),
   });
-  final result = await showFluidBarModalBottomSheet(
+  final shouldSave = await showFluidBarModalBottomSheet<bool>(
       context: context,
       builder: (context) {
-        return Container(
-          color: Colors.blue.shade600,
-          child: ReactiveForm(
-            formGroup: form,
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                children: [
-                  ReactiveTextField<int>(
-                    formControlName: 'id',
-                  ),
-                  ReactiveTextField<String>(
-                    formControlName: 'name',
-                  ),
-                  ReactiveTextField<double>(
-                    formControlName: 'amount',
-                  ),
-                  ReactiveDatePicker(
+        return DonationDialogContent(form: form);
+      });
+  if (shouldSave == true) {
+    final newDonation = Donation(
+        id: form.value['id'] as int?,
+        name: form.value['donator'] as String,
+        hiddenName: form.value['donator_hidden'] as String,
+        amount: ((form.value['value'] as double) * 100.0).toInt(),
+        date: (form.value['donation_date'] as DateTime).toIso8601String());
+    GetIt.I<DonationManager>().upsertDonation!(newDonation);
+  }
+}
+
+class DonationDialogContent extends StatelessWidget {
+  const DonationDialogContent({
+    Key? key,
+    required this.form,
+  }) : super(key: key);
+
+  final FormGroup form;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.blue.shade900,
+      child: ReactiveForm(
+        formGroup: form,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ReactiveTextField<int>(
+                formControlName: 'id',
+                decoration: InputDecoration(labelText: 'ID'),
+                readOnly: true,
+              ),
+              ReactiveTextField<String>(
+                formControlName: 'donator',
+                decoration: InputDecoration(labelText: 'Name'),
+              ),
+              ReactiveTextField<String>(
+                formControlName: 'donator_hidden',
+                decoration: InputDecoration(labelText: 'Hidden Name'),
+              ),
+              ReactiveTextField<double>(
+                formControlName: 'value',
+                decoration: InputDecoration(labelText: 'Amount'),
+              ),
+              ReactiveTextField<DateTime>(
+                formControlName: 'donation_date',
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: 'Birthday',
+                  suffixIcon: ReactiveDatePicker<DateTime>(
                     firstDate: DateTime.now().subtract(Duration(days: 30)),
                     lastDate: DateTime.now(),
-                    formControlName: 'date',
+                    formControlName: 'donation_date',
                     builder: (context, picker, child) {
                       return IconButton(
                         onPressed: picker.showPicker,
-                        icon: Icon(Icons.date_range),
+                        icon: const Icon(Icons.date_range),
                       );
                     },
                   ),
+                ),
+              ),
+              SizedBox(height: 24),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 8.0, top: 8, right: 8, bottom: 9),
+                      child: Text(
+                        'Cancel',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline5!
+                            .copyWith(color: Colors.white),
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: const Color(0xff115FA7),
+                      side:
+                          BorderSide(color: const Color(0xff115FA7), width: 3),
+                      shape: StadiumBorder(),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 8.0, top: 8, right: 8, bottom: 9),
+                      child: Text(
+                        'Save',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline5!
+                            .copyWith(color: Colors.white),
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: const Color(0xff115FA7),
+                      side:
+                          BorderSide(color: const Color(0xff115FA7), width: 3),
+                      shape: StadiumBorder(),
+                    ),
+                  ),
                 ],
               ),
-            ),
+            ],
           ),
-        );
-      });
+        ),
+      ),
+    );
+  }
 }
 
 class BarBottomSheet extends StatelessWidget {
