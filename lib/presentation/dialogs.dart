@@ -9,17 +9,224 @@ import 'package:layout/layout.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
-Future<void> showAddEditUsageDlg(BuildContext context, [Usage? usage]) async {}
 const Radius _kDefaultBarTopRadius = Radius.circular(15);
+
+Future<void> showAddEditUsageDlg(BuildContext context,
+    {Usage? usage, bool waiting = false}) async {
+  final form = FormGroup({
+    'id': FormControl<int>(value: usage?.id),
+    'receivers_name': FormControl<String>(value: usage?.name),
+    'receivers_hidden_name': FormControl<String>(value: usage?.hiddenName),
+    'usage': FormControl<String>(value: usage?.whatFor),
+    'value': FormControl<double>(
+        value: (usage?.amount ?? 0.0) / 100.0,
+        validators: [Validators.required, Validators.number]),
+    'usage_date': FormControl<DateTime>(
+        value: usage?.date != null
+            ? DateTime.tryParse(usage!.date!)
+            : DateTime.now()),
+    'storage_image_name': FormControl<String>(value: usage?.image),
+    'storage_image_name_person':
+        FormControl<String>(value: usage?.imageReceiver),
+  });
+  final shouldSave = await showFluidBarModalBottomSheet<bool>(
+      context: context,
+      builder: (context) {
+        return UsageDialogContent(
+          form: form,
+          newUsage: usage == null,
+          isWaitingEntry: waiting,
+        );
+      });
+  if (shouldSave == true) {
+    final newUsage = Usage(
+        id: form.value['id'] as int?,
+        name: form.value['receivers_name'] as String?,
+        hiddenName: form.value['receivers_hidden_name'] as String?,
+        amount: ((form.value['value'] as double) * 100.0).toInt(),
+        date: waiting
+            ? null
+            : (form.value['usage_date'] as DateTime).toIso8601String(),
+        whatFor: form.value['usage'] as String,
+        image: form.value['storage_image_name'] as String?,
+        imageReceiver: form.value['storage_image_name_person'] as String?);
+    GetIt.I<DonationManager>().upsertUsage!(newUsage);
+  }
+}
+
+class UsageDialogContent extends StatelessWidget {
+  const UsageDialogContent(
+      {Key? key,
+      required this.form,
+      required this.newUsage,
+      required this.isWaitingEntry})
+      : super(key: key);
+
+  final FormGroup form;
+  final bool newUsage;
+  final bool isWaitingEntry;
+
+  @override
+  Widget build(BuildContext context) {
+    late String headerText;
+    if (isWaitingEntry) {
+      if (newUsage) {
+        headerText = 'Add new Waiting Cause';
+      } else {
+        headerText = 'Edit Waiting Cause';
+      }
+    } else {
+      if (newUsage) {
+        headerText = 'Add new Usage';
+      } else {
+        headerText = 'Edit Usage';
+      }
+    }
+    return Container(
+      color: Colors.blue.shade900,
+      child: ReactiveForm(
+        formGroup: form,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                headerText,
+                style: Theme.of(context).textTheme.headline4,
+              ),
+              ReactiveTextField<int>(
+                formControlName: 'id',
+                decoration: InputDecoration(labelText: 'ID'),
+                readOnly: true,
+              ),
+              SizedBox(height: 8),
+              ReactiveTextField<String>(
+                formControlName: 'receivers_name',
+                decoration: InputDecoration(labelText: 'Recivers Name'),
+              ),
+              SizedBox(height: 8),
+              ReactiveTextField<String>(
+                formControlName: 'receivers_hidden_name',
+                decoration: InputDecoration(labelText: 'Hidden Name'),
+              ),
+              SizedBox(height: 8),
+              ReactiveTextField<double>(
+                formControlName: 'value',
+                decoration: InputDecoration(labelText: 'Amount'),
+              ),
+              SizedBox(height: 8),
+              ReactiveTextField<String>(
+                formControlName: 'usage',
+                decoration: InputDecoration(labelText: 'Description'),
+                maxLines: 10,
+              ),
+              SizedBox(height: 8),
+              ReactiveTextField<String>(
+                formControlName: 'storage_image_name',
+                decoration: InputDecoration(
+                  labelText: 'Image',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      Icons.image_search,
+                    ),
+                    onPressed: () {},
+                  ),
+                ),
+              ),
+              SizedBox(height: 8),
+              ReactiveTextField<String>(
+                formControlName: 'storage_image_name_person',
+                decoration: InputDecoration(
+                  labelText: 'Receiver\'s Image',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      Icons.image_search,
+                    ),
+                    onPressed: () {},
+                  ),
+                ),
+              ),
+              SizedBox(height: 8),
+              ReactiveTextField<DateTime>(
+                formControlName: 'usage_date',
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: 'Birthday',
+                  suffixIcon: ReactiveDatePicker<DateTime>(
+                    firstDate: DateTime.now().subtract(Duration(days: 30)),
+                    lastDate: DateTime.now(),
+                    formControlName: 'usage_date',
+                    builder: (context, picker, child) {
+                      return IconButton(
+                        onPressed: picker.showPicker,
+                        icon: const Icon(Icons.date_range),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(height: 48),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 8.0, top: 8, right: 8, bottom: 9),
+                      child: Text(
+                        'Cancel',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline5!
+                            .copyWith(color: Colors.white),
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: const Color(0xff115FA7),
+                      side:
+                          BorderSide(color: const Color(0xff115FA7), width: 3),
+                      shape: StadiumBorder(),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 8.0, top: 8, right: 8, bottom: 9),
+                      child: Text(
+                        'Save',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline5!
+                            .copyWith(color: Colors.white),
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: const Color(0xff115FA7),
+                      side:
+                          BorderSide(color: const Color(0xff115FA7), width: 3),
+                      shape: StadiumBorder(),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 Future<void> showAddEditDonationDlg(BuildContext context,
     [Donation? donation]) async {
-  final int? id;
-  final String? name;
-  final String? hiddenName;
-  final int amount;
-  final String date;
-
   final form = FormGroup({
     'id': FormControl<int>(value: donation?.id),
     'donator': FormControl<String>(value: donation?.name),
@@ -35,13 +242,16 @@ Future<void> showAddEditDonationDlg(BuildContext context,
   final shouldSave = await showFluidBarModalBottomSheet<bool>(
       context: context,
       builder: (context) {
-        return DonationDialogContent(form: form);
+        return DonationDialogContent(
+          form: form,
+          newDonation: donation == null,
+        );
       });
   if (shouldSave == true) {
     final newDonation = Donation(
         id: form.value['id'] as int?,
-        name: form.value['donator'] as String,
-        hiddenName: form.value['donator_hidden'] as String,
+        name: form.value['donator'] as String?,
+        hiddenName: form.value['donator_hidden'] as String?,
         amount: ((form.value['value'] as double) * 100.0).toInt(),
         date: (form.value['donation_date'] as DateTime).toIso8601String());
     GetIt.I<DonationManager>().upsertDonation!(newDonation);
@@ -49,12 +259,12 @@ Future<void> showAddEditDonationDlg(BuildContext context,
 }
 
 class DonationDialogContent extends StatelessWidget {
-  const DonationDialogContent({
-    Key? key,
-    required this.form,
-  }) : super(key: key);
+  const DonationDialogContent(
+      {Key? key, required this.form, required this.newDonation})
+      : super(key: key);
 
   final FormGroup form;
+  final bool newDonation;
 
   @override
   Widget build(BuildContext context) {
@@ -67,23 +277,31 @@ class DonationDialogContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text(
+                newDonation ? 'Add Donation' : 'Edit Donation',
+                style: Theme.of(context).textTheme.headline4,
+              ),
               ReactiveTextField<int>(
                 formControlName: 'id',
                 decoration: InputDecoration(labelText: 'ID'),
                 readOnly: true,
               ),
+              SizedBox(height: 8),
               ReactiveTextField<String>(
                 formControlName: 'donator',
                 decoration: InputDecoration(labelText: 'Name'),
               ),
+              SizedBox(height: 8),
               ReactiveTextField<String>(
                 formControlName: 'donator_hidden',
                 decoration: InputDecoration(labelText: 'Hidden Name'),
               ),
+              SizedBox(height: 8),
               ReactiveTextField<double>(
                 formControlName: 'value',
                 decoration: InputDecoration(labelText: 'Amount'),
               ),
+              SizedBox(height: 8),
               ReactiveTextField<DateTime>(
                 formControlName: 'donation_date',
                 readOnly: true,
@@ -102,7 +320,7 @@ class DonationDialogContent extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 24),
+              SizedBox(height: 48),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -317,4 +535,31 @@ Future<T?> showFluidBarModalBottomSheet<T>({
     duration: duration,
   ));
   return result;
+}
+
+Future<bool> showQueryDialog(BuildContext context, String title, String message,
+    {String trueText = 'Yes', String falseText = 'Cancel'}) async {
+  return (await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Text(trueText),
+            ),
+            FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text(falseText),
+            ),
+          ],
+        );
+      }))!;
 }

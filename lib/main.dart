@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage>
     final numWait = watchX((DonationManager m) => m.waitingUpdates).length;
 
     return Scaffold(
-      floatingActionButton: controller.index != 2 && hasWriteAcess
+      floatingActionButton: hasWriteAcess
           ? FloatingActionButton(
               backgroundColor: const Color(0xff115FA7),
               onPressed: () async {
@@ -70,8 +70,11 @@ class _MyHomePageState extends State<MyHomePage>
                   case 0:
                     await showAddEditDonationDlg(context);
                     break;
-                  case 0:
-                    await showAddEditUsageDlg(context);
+                  case 1:
+                    await showAddEditUsageDlg(context, waiting: false);
+                    break;
+                  case 2:
+                    await showAddEditUsageDlg(context, waiting: false);
                     break;
                   default:
                     assert(false, 'We should never get here');
@@ -172,71 +175,88 @@ class _Header extends StatelessWidget with GetItMixin {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    InkWell(
-                      onDoubleTap: () {
-                        get<AuthenticationManager>().loginCommand(
-                            LoginCredentials(
-                                'mail@devshelpdevs.org', 'staging'));
-                      },
-                      onTap: () async {
-                        await launch('https://www.devshelpdevs.org');
-                      },
-                      child: SvgPicture.asset(
-                        'assets/images/devshelpdevs-logo.svg',
-                        height: 100,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () async {
-                        await launch('https://paypal.me/pools/c/8xPwkVP3th');
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 8.0, top: 8, right: 8, bottom: 9),
-                        child: Text(
-                          'Donate here',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headline5!
-                              .copyWith(color: Colors.white),
+                    Expanded(
+                      flex: 2,
+                      child: InkWell(
+                        onDoubleTap: () {
+                          get<AuthenticationManager>().loginCommand(
+                              LoginCredentials(
+                                  'mail@devshelpdevs.org', 'staging'));
+                        },
+                        onTap: () async {
+                          await launch('https://www.devshelpdevs.org');
+                        },
+                        child: SvgPicture.asset(
+                          'assets/images/devshelpdevs-logo.svg',
+                          height: 100,
                         ),
                       ),
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: const Color(0xff115FA7),
-                        side: BorderSide(
-                            color: const Color(0xff115FA7), width: 3),
-                        shape: StadiumBorder(),
+                    ),
+                    Flexible(
+                      child: FittedBox(
+                        child: TextButton(
+                          onPressed: () async {
+                            await launch(
+                                'https://paypal.me/pools/c/8xPwkVP3th');
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                left: 8.0, top: 8, right: 8, bottom: 9),
+                            child: Text(
+                              'Donate here',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline5!
+                                  .copyWith(color: Colors.white),
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: const Color(0xff115FA7),
+                            side: BorderSide(
+                                color: const Color(0xff115FA7), width: 3),
+                            shape: StadiumBorder(),
+                          ),
+                        ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Text(
-                        'Donation Tracker',
-                        style: Theme.of(context).textTheme.headline4,
+                    Flexible(
+                      flex: 1,
+                      child: FittedBox(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Text(
+                            'Donation Tracker',
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(),
                     if (loggedIn)
-                      TextButton(
-                        onPressed: () {
-                          get<AuthenticationManager>().logoutCommand();
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 8.0, top: 8, right: 8, bottom: 9),
-                          child: Text(
-                            'Log out',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline5!
-                                .copyWith(color: Colors.white),
+                      Flexible(
+                        child: FittedBox(
+                          child: TextButton(
+                            onPressed: () {
+                              get<AuthenticationManager>().logoutCommand();
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 8.0, top: 8, right: 8, bottom: 9),
+                              child: Text(
+                                'Log out',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5!
+                                    .copyWith(color: Colors.white),
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: const Color(0xff115FA7),
+                              side: BorderSide(
+                                  color: const Color(0xff115FA7), width: 3),
+                              shape: StadiumBorder(),
+                            ),
                           ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: const Color(0xff115FA7),
-                          side: BorderSide(
-                              color: const Color(0xff115FA7), width: 3),
-                          shape: StadiumBorder(),
                         ),
                       ),
                   ],
