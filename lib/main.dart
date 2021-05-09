@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage>
               onPressed: () async {
                 switch (controller.index) {
                   case 0:
-                    await showSelectImageDlg(context);
+                    final fileName = await showSelectImageDlg(context);
                     // await showAddEditDonationDlg(context);
                     break;
                   case 1:

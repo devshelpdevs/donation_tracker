@@ -1,18 +1,23 @@
+import 'dart:ui';
+
 import 'package:deep_pick/deep_pick.dart';
 import 'package:donation_tracker/constants.dart';
 import 'package:donation_tracker/graphQlRequests.dart';
 import 'package:donation_tracker/models/donation.dart';
 import 'package:donation_tracker/models/usage.dart';
 import 'package:graphql/client.dart';
+import 'package:image/image.dart' as img;
 import 'package:nhost_graphql_adapter/nhost_graphql_adapter.dart';
 import 'package:nhost_sdk/nhost_sdk.dart';
 import 'package:rxdart/rxdart.dart';
 
 class StorageFileInfo {
   final String fileName;
+  final bool peopleStorage;
 
-  String get imageLink => '$nhostBaseUrl/storage/o/public/$fileName';
-  StorageFileInfo(this.fileName);
+  String get imageLink =>
+      '$nhostBaseUrl/storage/o/${peopleStorage ? 'people' : 'public'}/$fileName';
+  StorageFileInfo(this.fileName, this.peopleStorage);
 }
 
 class NhostService {
@@ -255,10 +260,36 @@ class NhostService {
     return Usage.fromMap(data);
   }
 
-  Future<List<StorageFileInfo>> getAvailableFiles() async {
-    return (await nhostClient.storage.getDirectoryMetadata('public/'))
-        .map((entry) =>
-            StorageFileInfo(entry.key.substring(entry.key.indexOf('/') + 1)))
-        .toList();
+  Future<List<StorageFileInfo>> getAvailableFiles([bool people = false]) async {
+    return (await nhostClient.storage
+            .getDirectoryMetadata(people ? 'people/' : 'public/'))
+        .where((entry) => (entry.contentLength ?? 0) > 0)
+        .map((entry) {
+      return StorageFileInfo(
+          entry.key.substring(entry.key.indexOf('/') + 1), people);
+    }).toList();
+  }
+
+  Future<void> upLoadImage(
+      {required bool people,
+      required Image image,
+      required String fileName}) async {
+    final startOfEnding = fileName.lastIndexOf('.');
+    late String uploadFileName;
+    if (startOfEnding >= 0) {
+      uploadFileName = fileName.substring(0, startOfEnding);
+    } else {
+      uploadFileName = fileName;
+    }
+    uploadFileName += '.jpg';
+    final data = (await image.toByteData(format: ImageByteFormat.rawRgba))!
+        .buffer
+        .asInt8List();
+    final encoder = img.JpegEncoder(quality: 60);
+    final jpgData = encoder
+        .encodeImage(img.Image.fromBytes(image.width, image.height, data));
+    await nhostClient.storage.uploadBytes(
+        filePath: (people ? 'people/' : 'public/') + uploadFileName,
+        bytes: jpgData);
   }
 }

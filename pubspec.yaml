@@ -29,6 +29,7 @@ dependencies:
   file_selector_windows: ^0.0.2 
   flutter_command: any
   get_it_mixin: ^3.1.1 
+  image:
   url_launcher:
   rxdart:
   layout:

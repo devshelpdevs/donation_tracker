@@ -4,7 +4,9 @@ import 'package:cropper/cropper.dart';
 import 'package:donation_tracker/_services/nhost_service.dart';
 import 'package:donation_tracker/presentation/dialogs.dart';
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/src/gestures/events.dart';
 import 'package:get_it/get_it.dart';
 
 Future<String?> showSelectImageDlg(
@@ -25,20 +27,47 @@ class SelectImageDlg extends StatefulWidget {
 }
 
 class _SelectImageDlgState extends State<SelectImageDlg> {
+  bool showPeople = false;
   List<StorageFileInfo> files = [];
   XFile? fileToUpLoad;
   CropController cropController = CropController(scale: 1.0);
+  TextEditingController textController = TextEditingController();
 
   @override
   void initState() {
-    GetIt.I<NhostService>().getAvailableFiles().then((files) {
+    getImagesFromServer();
+    super.initState();
+  }
+
+  void getImagesFromServer([bool showPeople = false]) {
+    GetIt.I<NhostService>().getAvailableFiles(showPeople).then((files) {
       if (mounted) {
         setState(() {
           this.files = files;
         });
       }
     });
-    super.initState();
+  }
+
+  Widget buildSelector() {
+    return CupertinoSegmentedControl<bool>(
+        unselectedColor: Colors.grey.shade400,
+        children: {
+          false: Padding(
+            child: Text('Stock Images'),
+            padding: const EdgeInsets.all(8),
+          ),
+          true: Padding(
+            child: Text('People'),
+            padding: const EdgeInsets.all(8),
+          ),
+        },
+        groupValue: showPeople,
+        onValueChanged: (newVal) async {
+          showPeople = newVal;
+          files = await GetIt.I<NhostService>().getAvailableFiles(showPeople);
+          setState(() {});
+        });
   }
 
   @override
@@ -52,9 +81,14 @@ class _SelectImageDlgState extends State<SelectImageDlg> {
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    'Select Image',
-                    style: Theme.of(context).textTheme.headline4,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('Select Image',
+                          style: Theme.of(context).textTheme.headline4),
+                      buildSelector()
+                    ],
                   ),
                   SizedBox(height: 16),
                   Expanded(
@@ -127,17 +161,97 @@ class _SelectImageDlgState extends State<SelectImageDlg> {
                   ),
                 ],
               )
-            : Crop(
-                helper: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 2),
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('Crop Image',
+                          style: Theme.of(context).textTheme.headline4),
+                      Spacer(),
+                      Text('upload to:'),
+                      buildSelector()
+                    ],
                   ),
-                ),
-                child: Image.file(
-                  File(fileToUpLoad!.path),
-                  fit: BoxFit.cover,
-                ),
-                controller: cropController);
+                  SizedBox(height: 24),
+                  Expanded(
+                    child: Listener(
+                      behavior: HitTestBehavior.opaque,
+                      onPointerSignal: handleScrollWheel,
+                      child: Crop(
+                          helper: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.white, width: 2),
+                            ),
+                          ),
+                          child: Image.file(
+                            File(fileToUpLoad!.path),
+                            fit: BoxFit.cover,
+                          ),
+                          controller: cropController),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    controller: textController,
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            fileToUpLoad = null;
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 8.0, top: 8, right: 8, bottom: 9),
+                          child: Text(
+                            'Cancel',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline5!
+                                .copyWith(color: Colors.white),
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: const Color(0xff115FA7),
+                          side: BorderSide(
+                              color: const Color(0xff115FA7), width: 3),
+                          shape: StadiumBorder(),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await cropAndUpload();
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 8.0, top: 8, right: 8, bottom: 9),
+                          child: Text(
+                            'Cropp & Upload',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline5!
+                                .copyWith(color: Colors.white),
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: const Color(0xff115FA7),
+                          side: BorderSide(
+                              color: const Color(0xff115FA7), width: 3),
+                          shape: StadiumBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              );
       }),
     );
   }
@@ -145,7 +259,29 @@ class _SelectImageDlgState extends State<SelectImageDlg> {
   Future<void> upLoadImage() async {
     final typeGroup = XTypeGroup(label: 'images', extensions: ['jpg', 'png']);
     fileToUpLoad = await openFile(acceptedTypeGroups: [typeGroup]);
+    if (fileToUpLoad == null) {
+      return;
+    }
+    textController.text = fileToUpLoad!.name;
     setState(() {});
+  }
+
+  void handleScrollWheel(PointerSignalEvent event) {
+    if (event is PointerScrollEvent) {
+      cropController.scale =
+          (cropController.scale + event.scrollDelta.dy.sign * 0.2).clamp(0, 10);
+    }
+  }
+
+  Future cropAndUpload() async {
+    final croppedImage = await cropController.crop();
+    //TODO error handling & busy state probably move to a Command
+    await GetIt.I<NhostService>().upLoadImage(
+        people: showPeople, image: croppedImage, fileName: textController.text);
+    files = await GetIt.I<NhostService>().getAvailableFiles(showPeople);
+    setState(() {
+      fileToUpLoad = null;
+    });
   }
 }
 
