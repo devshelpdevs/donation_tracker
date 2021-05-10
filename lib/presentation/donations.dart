@@ -38,7 +38,7 @@ class Donations extends StatelessWidget with GetItMixin {
                             final shouldDelete = await showQueryDialog(
                                 context,
                                 'Warning!',
-                                'Do you really want to delte this entry?');
+                                'Do you really want to delete this entry?');
                             if (shouldDelete) {
                               get<DonationManager>().deleteDonation!(data);
                             }

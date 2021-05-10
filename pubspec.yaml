@@ -23,6 +23,10 @@ environment:
 dependencies:
   intl: ^0.17.0
   cropper: ^0.5.2
+  dropfiles_window:
+    git:
+      url: https://github.com/escamoteur/dropfiles_window
+      ref: null-safety
   graphql: 5.0.0-nullsafety.1
   get_it: ^7.1.2
   file_selector: 

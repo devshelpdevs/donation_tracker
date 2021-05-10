@@ -124,12 +124,12 @@ class _MyHomePageState extends State<MyHomePage>
                           DonationUsages(
                             usageUpdates:
                                 GetIt.I<DonationManager>().usageUpdates,
-                            hasUsageDates: true,
+                            usageReceived: true,
                           ),
                           DonationUsages(
                             usageUpdates:
                                 GetIt.I<DonationManager>().waitingUpdates,
-                            hasUsageDates: false,
+                            usageReceived: false,
                           ),
                         ],
                       ),

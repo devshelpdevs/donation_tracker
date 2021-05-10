@@ -53,7 +53,8 @@ class NhostService {
     /// That's why we have to use differen't gql requests
     final donationDoc =
         gql(hasWriteAccess ? getDonationLoggedInRequest : getDonationsRequest);
-    final usageDoc = gql(getUsagesRequest);
+    final usageDoc =
+        gql(hasWriteAccess ? getUsageLoggedInRequest : getUsagesRequest);
 
     final Stream<QueryResult> donationTableUpdateStream = client
         .subscribe(SubscriptionOptions(document: donationDoc))

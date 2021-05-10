@@ -4,9 +4,11 @@ import 'package:cropper/cropper.dart';
 import 'package:donation_tracker/_services/nhost_service.dart';
 import 'package:donation_tracker/presentation/button.dart';
 import 'package:donation_tracker/presentation/dialogs.dart';
+import 'package:dropfiles_window/dropfiles_window.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/gestures/events.dart';
 import 'package:get_it/get_it.dart';
 
@@ -45,7 +47,41 @@ class _SelectImageDlgState extends State<SelectImageDlg> {
   void initState() {
     showPeople = widget.startShowingPeople;
     getImagesFromServer();
+    enableDropFilesOnWindows();
     super.initState();
+  }
+
+  void enableDropFilesOnWindows() {
+    if (Platform.isWindows == true) {
+      // Platform messages may fail, so we use a try/catch PlatformException.
+      try {
+        DropfilesWindow.modifyWindowAcceptFiles((String strName) {
+          // print("fileName=$strName");
+          fileToUpLoad = XFile(strName);
+          textController.text = fileToUpLoad!.name;
+          setState(() {});
+        });
+      } on PlatformException {
+        print('Failed to modifyDropFilesWindow.');
+      }
+    }
+  }
+
+  void disableDropFiles() {
+    if (Platform.isWindows == true) {
+      // Platform messages may fail, so we use a try/catch PlatformException.
+      try {
+        DropfilesWindow.modifyWindowAcceptFiles(null);
+      } on PlatformException {
+        print('Failed to reset modifyDropFilesWindow.');
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    disableDropFiles();
+    super.dispose();
   }
 
   void getImagesFromServer() {
@@ -75,7 +111,9 @@ class _SelectImageDlgState extends State<SelectImageDlg> {
         onValueChanged: (newVal) async {
           showPeople = newVal;
           files = await GetIt.I<NhostService>().getAvailableFiles(showPeople);
-          setState(() {});
+          if (mounted) {
+            setState(() {});
+          }
         });
   }
 
