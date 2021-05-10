@@ -2,9 +2,10 @@ import 'package:donation_tracker/_managers/authentication_manager.dart';
 import 'package:donation_tracker/_managers/donation_manager.dart';
 import 'package:donation_tracker/_services/nhost_service.dart';
 import 'package:donation_tracker/constants.dart';
-import 'package:donation_tracker/presentation/dialogs.dart';
+import 'package:donation_tracker/presentation/button.dart';
 import 'package:donation_tracker/presentation/donations.dart';
-import 'package:donation_tracker/presentation/select_image_dlg.dart';
+import 'package:donation_tracker/presentation/edit_donation_dlg.dart';
+import 'package:donation_tracker/presentation/edit_usage_dlg.dart';
 import 'package:donation_tracker/presentation/usage.dart';
 import 'package:donation_tracker/utils.dart';
 import 'package:flutter/material.dart';
@@ -63,20 +64,19 @@ class _MyHomePageState extends State<MyHomePage>
     final numWait = watchX((DonationManager m) => m.waitingUpdates).length;
 
     return Scaffold(
-      floatingActionButton: true //hasWriteAcess
+      floatingActionButton: hasWriteAcess
           ? FloatingActionButton(
               backgroundColor: const Color(0xff115FA7),
               onPressed: () async {
                 switch (controller.index) {
                   case 0:
-                    final fileName = await showSelectImageDlg(context);
-                    // await showAddEditDonationDlg(context);
+                    await showAddEditDonationDlg(context);
                     break;
                   case 1:
                     await showAddEditUsageDlg(context, waiting: false);
                     break;
                   case 2:
-                    await showAddEditUsageDlg(context, waiting: false);
+                    await showAddEditUsageDlg(context, waiting: true);
                     break;
                   default:
                     assert(false, 'We should never get here');
@@ -196,28 +196,12 @@ class _Header extends StatelessWidget with GetItMixin {
                     ),
                     Flexible(
                       child: FittedBox(
-                        child: TextButton(
+                        child: Button(
                           onPressed: () async {
                             await launch(
                                 'https://paypal.me/pools/c/8xPwkVP3th');
                           },
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                left: 8.0, top: 8, right: 8, bottom: 9),
-                            child: Text(
-                              'Donate here',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline5!
-                                  .copyWith(color: Colors.white),
-                            ),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: const Color(0xff115FA7),
-                            side: BorderSide(
-                                color: const Color(0xff115FA7), width: 3),
-                            shape: StadiumBorder(),
-                          ),
+                          text: 'Donate here',
                         ),
                       ),
                     ),
@@ -237,27 +221,11 @@ class _Header extends StatelessWidget with GetItMixin {
                     if (loggedIn)
                       Flexible(
                         child: FittedBox(
-                          child: TextButton(
+                          child: Button(
                             onPressed: () {
                               get<AuthenticationManager>().logoutCommand();
                             },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 8.0, top: 8, right: 8, bottom: 9),
-                              child: Text(
-                                'Log out',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headline5!
-                                    .copyWith(color: Colors.white),
-                              ),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: const Color(0xff115FA7),
-                              side: BorderSide(
-                                  color: const Color(0xff115FA7), width: 3),
-                              shape: StadiumBorder(),
-                            ),
+                            text: 'Log out',
                           ),
                         ),
                       ),

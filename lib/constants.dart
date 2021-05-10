@@ -26,3 +26,6 @@ const authPassword = const String.fromEnvironment('AUTH_PASSWORD');
 const graphQlEndPoint = 'https://hasura-$server/v1/graphql';
 
 const nhostBaseUrl = 'https://backend-$server';
+
+String buildImageLink(String fileName, bool peopleStorage) =>
+    '$nhostBaseUrl/storage/o/${peopleStorage ? 'people' : 'public'}/$fileName';

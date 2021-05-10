@@ -15,8 +15,7 @@ class StorageFileInfo {
   final String fileName;
   final bool peopleStorage;
 
-  String get imageLink =>
-      '$nhostBaseUrl/storage/o/${peopleStorage ? 'people' : 'public'}/$fileName';
+  String get imageLink => buildImageLink(fileName, peopleStorage);
   StorageFileInfo(this.fileName, this.peopleStorage);
 }
 

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cropper/cropper.dart';
 import 'package:donation_tracker/_services/nhost_service.dart';
+import 'package:donation_tracker/presentation/button.dart';
 import 'package:donation_tracker/presentation/dialogs.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,17 +12,24 @@ import 'package:get_it/get_it.dart';
 
 Future<String?> showSelectImageDlg(
   BuildContext context,
+  bool startShowingPeople,
 ) {
   return showFluidBarModalBottomSheet<String>(
     context: context,
     builder: (context) {
-      return SelectImageDlg();
+      return SelectImageDlg(
+        startShowingPeople: startShowingPeople,
+      );
     },
     enableDrag: false,
   );
 }
 
 class SelectImageDlg extends StatefulWidget {
+  final bool startShowingPeople;
+
+  const SelectImageDlg({Key? key, required this.startShowingPeople})
+      : super(key: key);
   @override
   _SelectImageDlgState createState() => _SelectImageDlgState();
 }
@@ -35,11 +43,12 @@ class _SelectImageDlgState extends State<SelectImageDlg> {
 
   @override
   void initState() {
+    showPeople = widget.startShowingPeople;
     getImagesFromServer();
     super.initState();
   }
 
-  void getImagesFromServer([bool showPeople = false]) {
+  void getImagesFromServer() {
     GetIt.I<NhostService>().getAvailableFiles(showPeople).then((files) {
       if (mounted) {
         setState(() {
@@ -113,49 +122,17 @@ class _SelectImageDlgState extends State<SelectImageDlg> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      TextButton(
+                      Button(
                         onPressed: () {
                           Navigator.of(context).pop(null);
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 8.0, top: 8, right: 8, bottom: 9),
-                          child: Text(
-                            'Cancel',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline5!
-                                .copyWith(color: Colors.white),
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: const Color(0xff115FA7),
-                          side: BorderSide(
-                              color: const Color(0xff115FA7), width: 3),
-                          shape: StadiumBorder(),
-                        ),
+                        text: 'Cancel',
                       ),
-                      TextButton(
+                      Button(
                         onPressed: () async {
                           await upLoadImage();
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 8.0, top: 8, right: 8, bottom: 9),
-                          child: Text(
-                            'Upload',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline5!
-                                .copyWith(color: Colors.white),
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: const Color(0xff115FA7),
-                          side: BorderSide(
-                              color: const Color(0xff115FA7), width: 3),
-                          shape: StadiumBorder(),
-                        ),
+                        text: 'Upload',
                       ),
                     ],
                   ),
@@ -202,51 +179,19 @@ class _SelectImageDlgState extends State<SelectImageDlg> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      TextButton(
+                      Button(
                         onPressed: () {
                           setState(() {
                             fileToUpLoad = null;
                           });
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 8.0, top: 8, right: 8, bottom: 9),
-                          child: Text(
-                            'Cancel',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline5!
-                                .copyWith(color: Colors.white),
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: const Color(0xff115FA7),
-                          side: BorderSide(
-                              color: const Color(0xff115FA7), width: 3),
-                          shape: StadiumBorder(),
-                        ),
+                        text: 'Cancel',
                       ),
-                      TextButton(
+                      Button(
                         onPressed: () async {
                           await cropAndUpload();
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 8.0, top: 8, right: 8, bottom: 9),
-                          child: Text(
-                            'Cropp & Upload',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline5!
-                                .copyWith(color: Colors.white),
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: const Color(0xff115FA7),
-                          side: BorderSide(
-                              color: const Color(0xff115FA7), width: 3),
-                          shape: StadiumBorder(),
-                        ),
+                        text: 'Cropp & Upload',
                       ),
                     ],
                   ),

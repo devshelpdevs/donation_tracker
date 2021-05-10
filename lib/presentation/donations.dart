@@ -2,6 +2,7 @@ import 'package:donation_tracker/_managers/donation_manager.dart';
 import 'package:donation_tracker/_services/nhost_service.dart';
 import 'package:donation_tracker/constants.dart';
 import 'package:donation_tracker/presentation/dialogs.dart';
+import 'package:donation_tracker/presentation/edit_donation_dlg.dart';
 import 'package:donation_tracker/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
