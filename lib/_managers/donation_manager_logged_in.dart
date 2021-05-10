@@ -10,7 +10,7 @@ class DonationManagerLoggedIn extends DonationManager implements Disposable {
     startDatabaseListeners();
 
     upsertDonation = Command.createAsync((donation) async {
-      if (donation!.id != null) {
+      if (donation.id != null) {
         await GetIt.I<NhostService>().updateDonation(donation);
       } else {
         await GetIt.I<NhostService>().addDonation(donation);
@@ -19,12 +19,12 @@ class DonationManagerLoggedIn extends DonationManager implements Disposable {
     }, false);
 
     deleteDonation = Command.createAsync((donation) async {
-      await GetIt.I<NhostService>().deleteDonation(donation!);
+      await GetIt.I<NhostService>().deleteDonation(donation);
       return true;
     }, false);
 
     upsertUsage = Command.createAsync((usage) async {
-      if (usage!.id != null) {
+      if (usage.id != null) {
         await GetIt.I<NhostService>().updateUsage(usage);
       } else {
         await GetIt.I<NhostService>().addUsage(usage);
@@ -33,7 +33,7 @@ class DonationManagerLoggedIn extends DonationManager implements Disposable {
     }, false);
 
     deleteUsage = Command.createAsync((usage) async {
-      await GetIt.I<NhostService>().deleteUsage(usage!);
+      await GetIt.I<NhostService>().deleteUsage(usage);
       return true;
     }, false);
   }
