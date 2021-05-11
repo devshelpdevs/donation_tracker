@@ -1,12 +1,10 @@
 import 'package:donation_tracker/_managers/donation_manager.dart';
 import 'package:donation_tracker/constants.dart';
 import 'package:donation_tracker/models/usage.dart';
-import 'package:donation_tracker/presentation/date_time_picker_nullable.dart';
 import 'package:donation_tracker/presentation/dialogs.dart';
 import 'package:donation_tracker/presentation/select_image_dlg.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'button.dart';
@@ -22,7 +20,7 @@ Future<void> showAddEditUsageDlg(BuildContext context,
         FormControl<double>(value: (usage?.amount ?? 0.0) / 100.0, validators: [
       Validators.required,
     ]),
-    'usage_date': FormControl<DateTime?>(
+    'usage_date': FormControl<DateTime>(
         value: usage?.date != null
             ? DateTime.tryParse(usage!.date!)
             : waiting
@@ -129,13 +127,12 @@ class _UsageDialogContentState extends State<UsageDialogContent> {
               ),
               SizedBox(height: 8),
               if (!widget.isWaitingEntry)
-                ReactiveTextField<DateTime?>(
-                  valueAccessor: DateTimeValueAccessorNullable(),
+                ReactiveTextField<DateTime>(
                   formControlName: 'usage_date',
                   readOnly: true,
                   decoration: InputDecoration(
                     labelText: 'Usage Date',
-                    suffixIcon: ReactiveDatePickerNullable<DateTime?>(
+                    suffixIcon: ReactiveDatePicker<DateTime>(
                       firstDate: DateTime.now().subtract(Duration(days: 30)),
                       lastDate: DateTime.now(),
                       formControlName: 'usage_date',
@@ -271,25 +268,5 @@ class _UsageDialogContentState extends State<UsageDialogContent> {
         ),
       ),
     );
-  }
-}
-
-class DateTimeValueAccessorNullable
-    extends ControlValueAccessor<DateTime?, String> {
-  final DateFormat dateTimeFormat;
-
-  DateTimeValueAccessorNullable({DateFormat? dateTimeFormat})
-      : dateTimeFormat = dateTimeFormat ?? DateFormat('yyyy/MM/dd');
-
-  @override
-  String modelToViewValue(DateTime? modelValue) {
-    return modelValue == null ? '' : dateTimeFormat.format(modelValue);
-  }
-
-  @override
-  DateTime? viewToModelValue(String? viewValue) {
-    return viewValue == null || viewValue.trim().isEmpty
-        ? null
-        : dateTimeFormat.parse(viewValue);
   }
 }
