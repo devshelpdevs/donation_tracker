@@ -7,6 +7,7 @@ import 'package:donation_tracker/presentation/dialogs.dart';
 import 'package:dropfiles_window/dropfiles_window.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/gestures/events.dart';
@@ -52,7 +53,7 @@ class _SelectImageDlgState extends State<SelectImageDlg> {
   }
 
   void enableDropFilesOnWindows() {
-    if (Platform.isWindows == true) {
+    if (!kIsWeb && Platform.isWindows == true) {
       // Platform messages may fail, so we use a try/catch PlatformException.
       try {
         DropfilesWindow.modifyWindowAcceptFiles((String strName) {
@@ -68,7 +69,7 @@ class _SelectImageDlgState extends State<SelectImageDlg> {
   }
 
   void disableDropFiles() {
-    if (Platform.isWindows == true) {
+    if (!kIsWeb && Platform.isWindows == true) {
       // Platform messages may fail, so we use a try/catch PlatformException.
       try {
         DropfilesWindow.modifyWindowAcceptFiles(null);
@@ -202,10 +203,15 @@ class _SelectImageDlgState extends State<SelectImageDlg> {
                               border: Border.all(color: Colors.white, width: 2),
                             ),
                           ),
-                          child: Image.file(
-                            File(fileToUpLoad!.path),
-                            fit: BoxFit.cover,
-                          ),
+                          child: kIsWeb
+                              ? Image.network(
+                                  fileToUpLoad!.path,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.file(
+                                  File(fileToUpLoad!.path),
+                                  fit: BoxFit.cover,
+                                ),
                           controller: cropController),
                     ),
                   ),

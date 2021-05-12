@@ -27,5 +27,5 @@ const graphQlEndPoint = 'https://hasura-$server/v1/graphql';
 
 const nhostBaseUrl = 'https://backend-$server';
 
-String buildImageLink(String fileName, bool peopleStorage) =>
-    '$nhostBaseUrl/storage/o/${peopleStorage ? 'people' : 'public'}/$fileName';
+String buildImageLink(String fileNamePath) =>
+    '$nhostBaseUrl/storage/o/public/$fileNamePath';

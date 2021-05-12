@@ -40,7 +40,7 @@ class Usage {
       image == null ? null : '$nhostBaseUrl/storage/o/public/$image';
   String? get imageReceiverLink => imageReceiver == null
       ? null
-      : '$nhostBaseUrl/storage/o/people/$imageReceiver';
+      : '$nhostBaseUrl/storage/o/public/$imageReceiver';
 
   Usage copyWith({
     int? id,

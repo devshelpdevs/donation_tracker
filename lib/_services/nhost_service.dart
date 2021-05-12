@@ -13,10 +13,11 @@ import 'package:rxdart/rxdart.dart';
 
 class StorageFileInfo {
   final String fileName;
-  final bool peopleStorage;
 
-  String get imageLink => buildImageLink(fileName, peopleStorage);
-  StorageFileInfo(this.fileName, this.peopleStorage);
+  String get imageLink => buildImageLink(fileName);
+  StorageFileInfo(
+    this.fileName,
+  );
 }
 
 class NhostService {
@@ -262,11 +263,12 @@ class NhostService {
 
   Future<List<StorageFileInfo>> getAvailableFiles([bool people = false]) async {
     return (await nhostClient.storage
-            .getDirectoryMetadata(people ? 'people/' : 'public/'))
+            .getDirectoryMetadata(people ? 'public/people/' : 'public/'))
         .where((entry) => (entry.contentLength ?? 0) > 0)
         .map((entry) {
       return StorageFileInfo(
-          entry.key.substring(entry.key.indexOf('/') + 1), people);
+        entry.key.substring(entry.key.indexOf('/') + 1),
+      );
     }).toList();
   }
 
@@ -289,7 +291,7 @@ class NhostService {
     final jpgData = encoder
         .encodeImage(img.Image.fromBytes(image.width, image.height, data));
     await nhostClient.storage.uploadBytes(
-        filePath: (people ? 'people/' : 'public/') + uploadFileName,
+        filePath: (people ? 'public/people/' : 'public/') + uploadFileName,
         bytes: jpgData);
   }
 }

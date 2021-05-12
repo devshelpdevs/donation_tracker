@@ -180,9 +180,8 @@ class _UsageDialogContentState extends State<UsageDialogContent> {
                           (widget.form.value['storage_image_name'] as String)
                               .isNotEmpty)
                         Image.network(
-                          buildImageLink(
-                              widget.form.value['storage_image_name'] as String,
-                              false),
+                          buildImageLink(widget.form.value['storage_image_name']
+                              as String),
                           width: 64,
                         )
                     ],
@@ -218,10 +217,8 @@ class _UsageDialogContentState extends State<UsageDialogContent> {
                                   as String)
                               .isNotEmpty)
                         Image.network(
-                          buildImageLink(
-                              widget.form.value['storage_image_name_person']
-                                  as String,
-                              true),
+                          buildImageLink(widget.form
+                              .value['storage_image_name_person'] as String),
                           width: 64,
                         )
                     ],
