@@ -7,8 +7,6 @@ import 'package:get_it/get_it.dart';
 
 class DonationManagerLoggedIn extends DonationManager implements Disposable {
   DonationManagerLoggedIn() {
-    startDatabaseListeners();
-
     upsertDonation = Command.createAsync((donation) async {
       if (donation.id != null) {
         await GetIt.I<NhostService>().updateDonation(donation);
