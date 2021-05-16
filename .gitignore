@@ -1,3 +1,7 @@
+# File used by https://detective.dev/, containing the VM service socket URL of
+# the currently running app
+detective_connect.txt
+
 # Miscellaneous
 *.class
 *.log
