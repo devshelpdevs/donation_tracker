@@ -14,6 +14,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
+import 'package:layout/layout.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main() {
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark,
           primarySwatch: Colors.blue,
         ),
-        home: MyHomePage(),
+        home: Layout(child: MyHomePage()),
       ),
     );
   }
@@ -90,67 +91,89 @@ class _MyHomePageState extends State<MyHomePage>
                 color: Colors.white,
               ))
           : null,
-      body: SafeArea(
-        child: isReady
-            ? Stack(
-                children: [
-                  Container(
-                    color: backgroundColor,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _Header(),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        TabBar(
-                            onTap: (index) => setState(() {}),
-                            tabs: [
-                              Tab(
-                                child: Text('Received Donations'.toUpperCase() +
-                                    ' ($numDonations)'),
-                              ),
-                              Tab(
-                                child: Text(
-                                    'Used for'.toUpperCase() + ' ($numUsed)'),
-                              ),
-                              Tab(
-                                child: Text('Waiting for Help'.toUpperCase() +
-                                    ' ($numWait)'),
-                              )
-                            ],
-                            controller: controller),
-                        Expanded(
-                          child: TabBarView(
-                            controller: controller,
-                            children: [
-                              Donations(),
-                              DonationUsages(
-                                usageUpdates:
-                                    GetIt.I<DonationManager>().usageUpdates,
-                                usageReceived: true,
-                              ),
-                              DonationUsages(
-                                usageUpdates:
-                                    GetIt.I<DonationManager>().waitingUpdates,
-                                usageReceived: false,
-                              ),
-                            ],
+      body: Theme(
+        data: Theme.of(context).copyWith(
+          tabBarTheme: TabBarTheme.of(context).copyWith(
+            labelStyle: TextStyle(
+              fontSize: context.layout.value(xs: 14, md: 16),
+            ),
+            unselectedLabelStyle: TextStyle(
+              fontSize: context.layout.value(xs: 12, md: 16),
+            ),
+          ),
+        ),
+        child: SafeArea(
+          child: isReady
+              ? Stack(
+                  children: [
+                    Container(
+                      color: backgroundColor,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _Header(),
+                          SizedBox(
+                            height: 8,
                           ),
-                        ),
-                      ],
+                          TabBar(
+                              onTap: (index) => setState(() {}),
+                              tabs: [
+                                Tab(
+                                  child: Text(context.layout
+                                          .value(
+                                              xs: 'Donations',
+                                              md: 'Received Donations')
+                                          .toUpperCase() +
+                                      ' ($numDonations)'),
+                                ),
+                                Tab(
+                                  child: Text(context.layout
+                                          .value(xs: 'Used', md: 'Used for')
+                                          .toUpperCase() +
+                                      ' ($numUsed)'),
+                                ),
+                                Tab(
+                                  child: Text(context.layout
+                                          .value(
+                                              xs: 'Waiting',
+                                              md: 'Waiting for Help')
+                                          .toUpperCase() +
+                                      ' ($numWait)'),
+                                )
+                              ],
+                              controller: controller),
+                          Expanded(
+                            child: TabBarView(
+                              controller: controller,
+                              children: [
+                                Donations(),
+                                DonationUsages(
+                                  usageUpdates:
+                                      GetIt.I<DonationManager>().usageUpdates,
+                                  usageReceived: true,
+                                ),
+                                DonationUsages(
+                                  usageUpdates:
+                                      GetIt.I<DonationManager>().waitingUpdates,
+                                  usageReceived: false,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  if (isLoading)
-                    Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                ],
-              )
-            : Center(
-                child: CircularProgressIndicator(),
-              ),
+                    if (isLoading)
+                      Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                  ],
+                )
+              : Center(
+                  child: CircularProgressIndicator(),
+                ),
+        ),
       ),
     );
   }
@@ -229,18 +252,19 @@ class _Header extends StatelessWidget with GetItMixin {
                         ),
                       ),
                     ),
-                    Flexible(
-                      flex: 1,
-                      child: FittedBox(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24.0),
-                          child: Text(
-                            'Donation Tracker',
-                            style: Theme.of(context).textTheme.headline4,
+                    if (context.layout.value(xs: false, lg: true))
+                      Flexible(
+                        flex: 1,
+                        child: FittedBox(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Text(
+                              'Donation Tracker',
+                              style: Theme.of(context).textTheme.headline4,
+                            ),
                           ),
                         ),
                       ),
-                    ),
                     SizedBox(),
                     if (loggedIn)
                       Flexible(
