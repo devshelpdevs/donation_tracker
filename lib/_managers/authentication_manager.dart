@@ -32,6 +32,7 @@ class AuthenticationManager {
   }
 
   Future<void> loginUser(String userName, String pwd) async {
+    if (isLoggedIn) return;
     if (await GetIt.I<NhostService>().loginUser(userName, pwd)) {
       GetIt.I.pushNewScope(
           scopeName: 'logged In',

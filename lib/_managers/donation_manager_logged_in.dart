@@ -2,10 +2,15 @@ import 'dart:async';
 
 import 'package:donation_tracker/_managers/donation_manager.dart';
 import 'package:donation_tracker/_services/nhost_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_command/flutter_command.dart';
+import 'package:functional_listener/functional_listener.dart';
 import 'package:get_it/get_it.dart';
 
 class DonationManagerLoggedIn extends DonationManager implements Disposable {
+  @override
+  late final ValueListenable<bool> loading;
+
   DonationManagerLoggedIn() {
     upsertDonation = Command.createAsync((donation) async {
       if (donation.id != null) {
@@ -18,6 +23,7 @@ class DonationManagerLoggedIn extends DonationManager implements Disposable {
 
     deleteDonation = Command.createAsync((donation) async {
       await GetIt.I<NhostService>().deleteDonation(donation);
+      await Future.delayed(const Duration(seconds: 2));
       return true;
     }, false);
 
@@ -32,8 +38,15 @@ class DonationManagerLoggedIn extends DonationManager implements Disposable {
 
     deleteUsage = Command.createAsync((usage) async {
       await GetIt.I<NhostService>().deleteUsage(usage);
+      await Future.delayed(const Duration(seconds: 2));
       return true;
     }, false);
+
+    loading = upsertDonation!.isExecuting.mergeWith([
+      deleteDonation!.isExecuting,
+      upsertUsage!.isExecuting,
+      deleteUsage!.isExecuting
+    ]);
   }
   @override
   FutureOr onDispose() {

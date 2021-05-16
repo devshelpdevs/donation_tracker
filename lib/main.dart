@@ -3,6 +3,7 @@ import 'package:donation_tracker/_managers/donation_manager.dart';
 import 'package:donation_tracker/_services/nhost_service.dart';
 import 'package:donation_tracker/constants.dart';
 import 'package:donation_tracker/presentation/button.dart';
+import 'package:donation_tracker/presentation/dialogs.dart';
 import 'package:donation_tracker/presentation/donations.dart';
 import 'package:donation_tracker/presentation/edit_donation_dlg.dart';
 import 'package:donation_tracker/presentation/edit_usage_dlg.dart';
@@ -63,6 +64,8 @@ class _MyHomePageState extends State<MyHomePage>
     final numUsed = watchX((DonationManager m) => m.usageUpdates).length;
     final numWait = watchX((DonationManager m) => m.waitingUpdates).length;
 
+    final isLoading = watchX((DonationManager m) => m.loading);
+
     return Scaffold(
       floatingActionButton: hasWriteAcess
           ? FloatingActionButton(
@@ -89,53 +92,61 @@ class _MyHomePageState extends State<MyHomePage>
           : null,
       body: SafeArea(
         child: isReady
-            ? Container(
-                color: backgroundColor,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _Header(),
-                    SizedBox(
-                      height: 8,
+            ? Stack(
+                children: [
+                  Container(
+                    color: backgroundColor,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _Header(),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        TabBar(
+                            onTap: (index) => setState(() {}),
+                            tabs: [
+                              Tab(
+                                child: Text('Received Donations'.toUpperCase() +
+                                    ' ($numDonations)'),
+                              ),
+                              Tab(
+                                child: Text(
+                                    'Used for'.toUpperCase() + ' ($numUsed)'),
+                              ),
+                              Tab(
+                                child: Text('Waiting for Help'.toUpperCase() +
+                                    ' ($numWait)'),
+                              )
+                            ],
+                            controller: controller),
+                        Expanded(
+                          child: TabBarView(
+                            controller: controller,
+                            children: [
+                              Donations(),
+                              DonationUsages(
+                                usageUpdates:
+                                    GetIt.I<DonationManager>().usageUpdates,
+                                usageReceived: true,
+                              ),
+                              DonationUsages(
+                                usageUpdates:
+                                    GetIt.I<DonationManager>().waitingUpdates,
+                                usageReceived: false,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    TabBar(
-                        onTap: (index) => setState(() {}),
-                        tabs: [
-                          Tab(
-                            child: Text('Received Donations'.toUpperCase() +
-                                ' ($numDonations)'),
-                          ),
-                          Tab(
-                            child:
-                                Text('Used for'.toUpperCase() + ' ($numUsed)'),
-                          ),
-                          Tab(
-                            child: Text('Waiting for Help'.toUpperCase() +
-                                ' ($numWait)'),
-                          )
-                        ],
-                        controller: controller),
-                    Expanded(
-                      child: TabBarView(
-                        controller: controller,
-                        children: [
-                          Donations(),
-                          DonationUsages(
-                            usageUpdates:
-                                GetIt.I<DonationManager>().usageUpdates,
-                            usageReceived: true,
-                          ),
-                          DonationUsages(
-                            usageUpdates:
-                                GetIt.I<DonationManager>().waitingUpdates,
-                            usageReceived: false,
-                          ),
-                        ],
-                      ),
+                  ),
+                  if (isLoading)
+                    Center(
+                      child: CircularProgressIndicator(),
                     ),
-                  ],
-                ),
+                ],
               )
             : Center(
                 child: CircularProgressIndicator(),
@@ -161,6 +172,7 @@ class _Header extends StatelessWidget with GetItMixin {
     final totalDonated = watchX((DonationManager m) => m.totalDonated);
     final totalUsed = watchX((DonationManager m) => m.totalUsed);
     final totalWaiting = watchX((DonationManager m) => m.totalWaiting);
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -180,10 +192,22 @@ class _Header extends StatelessWidget with GetItMixin {
                     Expanded(
                       flex: 2,
                       child: InkWell(
-                        onDoubleTap: () {
-                          get<AuthenticationManager>().loginCommand(
-                              LoginCredentials(
-                                  'mail@devshelpdevs.org', 'staging'));
+                        onDoubleTap: () async {
+                          if (isProduction) {
+                            final credentials = await showLoginDialog(
+                                context: context,
+                                userNamePrefill: 'mail@devshelpdevs.org');
+                            if (credentials != null) {
+                              get<AuthenticationManager>().loginCommand(
+                                LoginCredentials(
+                                    credentials.userName, credentials.password),
+                              );
+                            }
+                          } else {
+                            get<AuthenticationManager>().loginCommand(
+                                LoginCredentials(
+                                    'mail@devshelpdevs.org', 'staging'));
+                          }
                         },
                         onTap: () async {
                           await launch('https://www.devshelpdevs.org');

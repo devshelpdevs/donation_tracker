@@ -8,7 +8,7 @@ import 'package:flutter_command/flutter_command.dart';
 import 'package:get_it/get_it.dart';
 
 class DonationManager implements ShadowChangeHandlers {
-  final loading = ValueNotifier(false);
+  final ValueListenable<bool> loading = ValueNotifier(false);
   final error = ValueNotifier<String?>(null);
   final totalDonated = ValueNotifier(0);
   final totalUsed = ValueNotifier(0);
