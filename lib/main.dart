@@ -16,6 +16,7 @@ import 'package:get_it/get_it.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:layout/layout.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:routemaster/routemaster.dart';
 
 void main() {
   GetIt.I.registerSingleton(NhostService());
@@ -25,19 +26,44 @@ void main() {
   runApp(MyApp());
 }
 
+final routes = RouteMap(
+  routes: {
+    '/': (_) => TabPage(
+          paths: ['/donations', '/used', '/waiting'],
+          child: Layout(child: MyHomePage()),
+        ),
+    '/donations': (_) => MaterialPage(child: Donations()),
+    '/used': (_) => MaterialPage(
+          child: DonationUsages(
+            usageUpdates: GetIt.I<DonationManager>().usageUpdates,
+            usageReceived: true,
+          ),
+        ),
+    '/waiting': (_) => MaterialPage(
+          child: DonationUsages(
+            usageUpdates: GetIt.I<DonationManager>().waitingUpdates,
+            usageReceived: false,
+          ),
+        ),
+  },
+);
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return ShiftRightFixer(
-      child: MaterialApp(
+      child: MaterialApp.router(
         title: 'Usage overview of DevsHelpDevs\'donations',
         theme: ThemeData(
           scaffoldBackgroundColor: backgroundColor,
           brightness: Brightness.dark,
           primarySwatch: Colors.blue,
         ),
-        home: Layout(child: MyHomePage()),
+        routeInformationParser: const RoutemasterParser(),
+        routerDelegate: RoutemasterDelegate(
+          routesBuilder: (BuildContext context) => routes,
+        ),
       ),
     );
   }
@@ -48,11 +74,7 @@ class MyHomePage extends StatefulWidget with GetItStatefulWidgetMixin {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage>
-    with GetItStateMixin, SingleTickerProviderStateMixin {
-  late final controller =
-      TabController(initialIndex: 0, length: 3, vsync: this);
-
+class _MyHomePageState extends State<MyHomePage> with GetItStateMixin {
   @override
   Widget build(BuildContext context) {
     rebuildOnScopeChanges();
@@ -67,12 +89,14 @@ class _MyHomePageState extends State<MyHomePage>
 
     final isLoading = watchX((DonationManager m) => m.loading);
 
+    final tabPage = TabPage.of(context);
+
     return Scaffold(
       floatingActionButton: hasWriteAcess
           ? FloatingActionButton(
               backgroundColor: const Color(0xff115FA7),
               onPressed: () async {
-                switch (controller.index) {
+                switch (tabPage.controller.index) {
                   case 0:
                     await showAddEditDonationDlg(context);
                     break;
@@ -142,22 +166,13 @@ class _MyHomePageState extends State<MyHomePage>
                                       ' ($numWait)'),
                                 )
                               ],
-                              controller: controller),
+                              controller: tabPage.controller),
                           Expanded(
                             child: TabBarView(
-                              controller: controller,
+                              controller: tabPage.controller,
                               children: [
-                                Donations(),
-                                DonationUsages(
-                                  usageUpdates:
-                                      GetIt.I<DonationManager>().usageUpdates,
-                                  usageReceived: true,
-                                ),
-                                DonationUsages(
-                                  usageUpdates:
-                                      GetIt.I<DonationManager>().waitingUpdates,
-                                  usageReceived: false,
-                                ),
+                                for (final stack in tabPage.stacks)
+                                  PageStackNavigator(stack: stack),
                               ],
                             ),
                           ),
@@ -176,12 +191,6 @@ class _MyHomePageState extends State<MyHomePage>
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
   }
 }
 

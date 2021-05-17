@@ -44,6 +44,7 @@ dependencies:
   nhost_sdk: ^1.0.1
   nhost_graphql_adapter: ^1.0.1
   reactive_forms:
+  routemaster: ^0.8.1
   flutter:
     sdk: flutter
 
