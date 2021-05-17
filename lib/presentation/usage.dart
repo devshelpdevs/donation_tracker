@@ -115,7 +115,7 @@ class DonationUsages extends StatelessWidget with GetItMixin {
                         ],
                       )
                     : Card(
-                        color: Colors.blue.shade900,
+                        color: Colors.white.withAlpha(20),
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
@@ -126,9 +126,10 @@ class DonationUsages extends StatelessWidget with GetItMixin {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  if (usageReceived)
-                                    Text(data.date?.toDateTime().format() ??
-                                        'missing'),
+                                  usageReceived
+                                      ? Text(data.date?.toDateTime().format() ??
+                                          'missing')
+                                      : SizedBox(),
                                   Text(
                                     data.amount.toCurrency(),
                                     textAlign: TextAlign.justify,

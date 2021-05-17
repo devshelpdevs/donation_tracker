@@ -15,10 +15,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:layout/layout.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:routemaster/routemaster.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 void main() {
+  setPathUrlStrategy();
   GetIt.I.registerSingleton(NhostService());
   GetIt.I.registerSingleton(AuthenticationManager());
   GetIt.I.registerSingleton(DonationManager());
