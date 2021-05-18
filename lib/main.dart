@@ -17,10 +17,10 @@ import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:layout/layout.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_strategy/url_strategy.dart';
 
 void main() {
-  setPathUrlStrategy();
+  Routemaster.setPathUrlStrategy();
+
   GetIt.I.registerSingleton(NhostService());
   GetIt.I.registerSingleton(AuthenticationManager());
   GetIt.I.registerSingleton(DonationManager());
@@ -30,22 +30,12 @@ void main() {
 
 final routes = RouteMap(
   routes: {
-    '/': (_) => TabPage(
-          paths: ['/donations', '/used', '/waiting'],
-          child: Layout(child: MyHomePage()),
-        ),
-    '/donations': (_) => MaterialPage(child: Donations()),
-    '/used': (_) => MaterialPage(
-          child: DonationUsages(
-            usageUpdates: GetIt.I<DonationManager>().usageUpdates,
-            usageReceived: true,
-          ),
-        ),
-    '/waiting': (_) => MaterialPage(
-          child: DonationUsages(
-            usageUpdates: GetIt.I<DonationManager>().waitingUpdates,
-            usageReceived: false,
-          ),
+    '/': (_) => Redirect('/donated'),
+    '/:tab': (route) => MaterialPage(
+          child: Layout(
+              child: MyHomePage(
+            activeTab: route.pathParameters['tab'] ?? 'donated',
+          )),
         ),
   },
 );
@@ -56,7 +46,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ShiftRightFixer(
       child: MaterialApp.router(
-        title: 'Usage overview of DevsHelpDevs\'donations',
+        title: 'Usage overview of DevsHelpDevs',
         theme: ThemeData(
           scaffoldBackgroundColor: backgroundColor,
           brightness: Brightness.dark,
@@ -72,11 +62,37 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget with GetItStatefulWidgetMixin {
+  final String activeTab;
+
+  MyHomePage({Key? key, required this.activeTab}) : super(key: key);
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with GetItStateMixin {
+class _MyHomePageState extends State<MyHomePage>
+    with GetItStateMixin, SingleTickerProviderStateMixin {
+  late final TabController controller;
+  @override
+  void initState() {
+    int initialTab = 0;
+    switch (widget.activeTab) {
+      case 'donated':
+        initialTab = 0;
+        break;
+      case 'used':
+        initialTab = 1;
+        break;
+      case 'waiting':
+        initialTab = 2;
+        break;
+      default:
+        initialTab = 1;
+    }
+    controller =
+        TabController(length: 3, vsync: this, initialIndex: initialTab);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     rebuildOnScopeChanges();
@@ -91,14 +107,12 @@ class _MyHomePageState extends State<MyHomePage> with GetItStateMixin {
 
     final isLoading = watchX((DonationManager m) => m.loading);
 
-    final tabPage = TabPage.of(context);
-
     return Scaffold(
       floatingActionButton: hasWriteAcess
           ? FloatingActionButton(
               backgroundColor: const Color(0xff115FA7),
               onPressed: () async {
-                switch (tabPage.controller.index) {
+                switch (controller.index) {
                   case 0:
                     await showAddEditDonationDlg(context);
                     break;
@@ -168,13 +182,22 @@ class _MyHomePageState extends State<MyHomePage> with GetItStateMixin {
                                       ' ($numWait)'),
                                 )
                               ],
-                              controller: tabPage.controller),
+                              controller: controller),
                           Expanded(
                             child: TabBarView(
-                              controller: tabPage.controller,
+                              controller: controller,
                               children: [
-                                for (final stack in tabPage.stacks)
-                                  PageStackNavigator(stack: stack),
+                                Donations(),
+                                DonationUsages(
+                                  usageUpdates:
+                                      GetIt.I<DonationManager>().usageUpdates,
+                                  usageReceived: true,
+                                ),
+                                DonationUsages(
+                                  usageUpdates:
+                                      GetIt.I<DonationManager>().waitingUpdates,
+                                  usageReceived: false,
+                                ),
                               ],
                             ),
                           ),

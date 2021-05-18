@@ -47,6 +47,9 @@ class DonationManagerLoggedIn extends DonationManager implements Disposable {
       upsertUsage!.isExecuting,
       deleteUsage!.isExecuting
     ]);
+    deleteUsage!.thrownExceptions.listen((error, _) {
+      print(error.toString());
+    });
   }
   @override
   FutureOr onDispose() {

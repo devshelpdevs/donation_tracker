@@ -20,6 +20,9 @@ class DonationUsages extends StatelessWidget with GetItMixin {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
+    usageUpdates.addListener(() {
+      print('Usage update');
+    });
     final loggedIn = get<AuthenticationManager>().isLoggedIn;
     final usages =
         watch<ValueListenable<List<Usage>>, List<Usage>>(target: usageUpdates);
