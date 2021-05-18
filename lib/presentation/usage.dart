@@ -19,12 +19,13 @@ class DonationUsages extends StatelessWidget with GetItMixin {
   DonationUsages(
       {Key? key, required this.usageUpdates, required this.usageReceived})
       : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final loggedIn = get<AuthenticationManager>().isLoggedIn;
     final usages =
         watch<ValueListenable<List<Usage>>, List<Usage>>(target: usageUpdates);
-
+    const double picWidth = 120;
     return Padding(
       padding: context.layout.value(
         xs: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
@@ -34,18 +35,22 @@ class DonationUsages extends StatelessWidget with GetItMixin {
         if (context.layout.value(xs: false, md: true))
           DefaultTextStyle.merge(
             style: tableHeaderStyle,
-            child: Row(
-              children: [
-                if (usageReceived) Expanded(child: Text('Date')),
-                Expanded(child: Text('Amount')),
-                Expanded(child: Text('Usage')),
-                Spacer(),
-                Expanded(child: Text('Receiver')),
-                if (loggedIn) Expanded(child: Text('Hidden Name')),
-                Spacer(),
-                Spacer(),
-                if (loggedIn) Spacer()
-              ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  if (usageReceived) Expanded(child: Text('Date')),
+                  Expanded(child: Text('Amount')),
+                  Expanded(child: Text('Usage')),
+                  Spacer(),
+                  Expanded(child: Text('Receiver')),
+                  if (loggedIn) Expanded(child: Text('Hidden Name')),
+                  if (loggedIn) Spacer(),
+                  SizedBox(
+                    width: picWidth * 2,
+                  ),
+                ],
+              ),
             ),
           ),
         SizedBox(
@@ -70,14 +75,14 @@ class DonationUsages extends StatelessWidget with GetItMixin {
                                 children: [
                                   if (usageReceived)
                                     Expanded(
-                                        child: Text(
-                                            data.date?.toDateTime().format() ??
-                                                'missing')),
+                                      child: Text(data.dateText),
+                                    ),
                                   Expanded(
-                                      child: Text(
-                                    data.amount.toCurrency(),
-                                    textAlign: TextAlign.justify,
-                                  )),
+                                    child: Text(
+                                      data.amount.toCurrency(),
+                                      textAlign: TextAlign.justify,
+                                    ),
+                                  ),
                                   Expanded(child: Text(data.whatFor)),
                                   Spacer(),
                                   Expanded(
@@ -101,15 +106,10 @@ class DonationUsages extends StatelessWidget with GetItMixin {
                                           child: Text(
                                               data.hiddenName ?? 'anonymous')),
                                     ),
-                                  Expanded(
-                                    child: _EnlargableImage(
-                                      imageLink: data.imageLink,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: _EnlargableImage(
-                                      imageLink: data.imageReceiverLink,
-                                    ),
+                                  _ImageRow(
+                                    picWidth: picWidth,
+                                    productUrl: data.imageLink!,
+                                    receiverUrl: data.imageReceiverLink,
                                   ),
                                   if (loggedIn)
                                     Row(
@@ -231,8 +231,47 @@ class DonationUsages extends StatelessWidget with GetItMixin {
   }
 }
 
+class _ImageRow extends StatelessWidget {
+  final String productUrl;
+  final String? receiverUrl;
+  final double picWidth;
+
+  const _ImageRow({
+    Key? key,
+    required this.productUrl,
+    required this.receiverUrl,
+    required this.picWidth,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final hasReceiverUrl = receiverUrl != null;
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xff191925),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Row(
+        children: [
+          SizedBox(
+            width: hasReceiverUrl ? picWidth : picWidth * 2,
+            child: _EnlargableImage(imageLink: productUrl),
+          ),
+          if (hasReceiverUrl)
+            SizedBox(
+              width: picWidth,
+              child: _EnlargableImage(imageLink: receiverUrl),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _EnlargableImage extends StatelessWidget {
   final String? imageLink;
+
   const _EnlargableImage({
     Key? key,
     this.imageLink,
@@ -240,42 +279,54 @@ class _EnlargableImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      child: imageLink == null
-          ? Container()
-          : Image.network(
-              imageLink!,
-              loadingBuilder: (BuildContext context, Widget child,
-                  ImageChunkEvent? loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                  ),
-                );
-              },
-              fit: BoxFit.cover,
-            ),
-      onTap: imageLink != null
-          ? () {
+    if (imageLink == null) return SizedBox.shrink();
+    final imageWidget = Image.network(
+      imageLink!,
+      loadingBuilder: (BuildContext context, Widget child,
+          ImageChunkEvent? loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Center(
+          child: CircularProgressIndicator(
+            value: loadingProgress.expectedTotalBytes != null
+                ? loadingProgress.cumulativeBytesLoaded /
+                    loadingProgress.expectedTotalBytes!
+                : null,
+          ),
+        );
+      },
+      fit: BoxFit.cover,
+    );
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Positioned.fill(child: imageWidget),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
               showDialog(
                 context: context,
                 builder: (context) {
                   return AlertDialog(
                     content: Image.network(
                       imageLink!,
-                      loadingBuilder: (BuildContext context, Widget child,
-                          ImageChunkEvent? loadingProgress) {
+                      loadingBuilder: (
+                        BuildContext context,
+                        Widget child,
+                        ImageChunkEvent? loadingProgress,
+                      ) {
                         if (loadingProgress == null) return child;
                         return Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
+                          child: SizedBox(
+                            width: 12,
+                            height: 12,
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
                           ),
                         );
                       },
@@ -292,8 +343,10 @@ class _EnlargableImage extends StatelessWidget {
                   );
                 },
               );
-            }
-          : null,
+            },
+          ),
+        ),
+      ],
     );
   }
 }
