@@ -15,7 +15,8 @@ Future<void> showAddEditUsageDlg(BuildContext context,
     'id': FormControl<int>(value: usage?.id),
     'receivers_name': FormControl<String>(value: usage?.name),
     'receivers_hidden_name': FormControl<String>(value: usage?.hiddenName),
-    'usage': FormControl<String>(value: usage?.whatFor),
+    'usage': FormControl<String>(
+        value: usage?.whatFor, validators: [Validators.required]),
     'value':
         FormControl<double>(value: (usage?.amount ?? 0.0) / 100.0, validators: [
       Validators.required,
@@ -31,6 +32,7 @@ Future<void> showAddEditUsageDlg(BuildContext context,
         FormControl<String>(value: usage?.imageReceiver),
   });
   final shouldSave = await showFluidBarModalBottomSheet<bool>(
+      enableDrag: false,
       context: context,
       builder: (context) {
         return UsageDialogContent(
@@ -93,6 +95,7 @@ class _UsageDialogContentState extends State<UsageDialogContent> {
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
@@ -183,6 +186,7 @@ class _UsageDialogContentState extends State<UsageDialogContent> {
                           buildImageLink(widget.form.value['storage_image_name']
                               as String),
                           width: 64,
+                          height: 64,
                         )
                     ],
                   ),
@@ -220,6 +224,7 @@ class _UsageDialogContentState extends State<UsageDialogContent> {
                           buildImageLink(widget.form
                               .value['storage_image_name_person'] as String),
                           width: 64,
+                          height: 64,
                         )
                     ],
                   ),
