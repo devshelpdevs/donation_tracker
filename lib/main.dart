@@ -30,7 +30,7 @@ void main() {
 
 final routes = RouteMap(
   routes: {
-    '/': (_) => Redirect('/donated'),
+    '/': (_) => Redirect('/waiting'),
     '/:tab': (route) => MaterialPage(
           child: Layout(
               child: MyHomePage(
@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage>
     int initialTab = 0;
     switch (widget.activeTab) {
       case 'donated':
-        initialTab = 2;
+        initialTab = 0;
         break;
       case 'used':
         initialTab = 1;

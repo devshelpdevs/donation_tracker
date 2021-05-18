@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:layout/layout.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'dialogs.dart';
 
@@ -84,8 +85,21 @@ class DonationUsages extends StatelessWidget with GetItMixin {
                                   ),
                                   if (loggedIn)
                                     Expanded(
-                                      child:
-                                          Text(data.hiddenName ?? 'anonymous'),
+                                      child: InkWell(
+                                          onTap: () async {
+                                            if (data.hiddenName != null) {
+                                              if (data.hiddenName!
+                                                  .startsWith('@')) {
+                                                final twitterName = data
+                                                    .hiddenName!
+                                                    .substring(1);
+                                                await launch(
+                                                    'https://twitter.com/$twitterName');
+                                              }
+                                            }
+                                          },
+                                          child: Text(
+                                              data.hiddenName ?? 'anonymous')),
                                     ),
                                   Expanded(
                                     child: _EnlargableImage(
@@ -163,17 +177,20 @@ class DonationUsages extends StatelessWidget with GetItMixin {
                               if (loggedIn)
                                 Text(data.hiddenName ?? 'anonymous'),
                               SizedBox(height: 16),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  _EnlargableImage(
-                                    imageLink: data.imageLink,
-                                  ),
-                                  _EnlargableImage(
-                                    imageLink: data.imageReceiverLink,
-                                  ),
-                                ],
+                              SizedBox(
+                                height: 128,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    _EnlargableImage(
+                                      imageLink: data.imageLink,
+                                    ),
+                                    _EnlargableImage(
+                                      imageLink: data.imageReceiverLink,
+                                    ),
+                                  ],
+                                ),
                               ),
                               if (loggedIn)
                                 Row(
