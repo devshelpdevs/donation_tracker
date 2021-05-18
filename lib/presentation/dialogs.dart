@@ -123,7 +123,7 @@ Future<T?> showFluidBarModalBottomSheet<T>({
   bool expand = false,
   AnimationController? secondAnimation,
   Curve? animationCurve,
-  bool useRootNavigator = false,
+  bool useRootNavigator = true,
   bool isDismissible = true,
   bool enableDrag = true,
   Widget? topControl,

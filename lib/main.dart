@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage>
     int initialTab = 0;
     switch (widget.activeTab) {
       case 'donated':
-        initialTab = 0;
+        initialTab = 2;
         break;
       case 'used':
         initialTab = 1;
@@ -86,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage>
         initialTab = 2;
         break;
       default:
-        initialTab = 1;
+        initialTab = 0;
     }
     controller =
         TabController(length: 3, vsync: this, initialIndex: initialTab);

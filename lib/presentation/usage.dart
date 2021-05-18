@@ -57,62 +57,78 @@ class DonationUsages extends StatelessWidget with GetItMixin {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4.0),
                 child: context.layout.value(xs: false, sm: true)
-                    ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (usageReceived)
-                            Expanded(
-                                child: Text(data.date?.toDateTime().format() ??
-                                    'missing')),
-                          Expanded(
-                              child: Text(
-                            data.amount.toCurrency(),
-                            textAlign: TextAlign.justify,
-                          )),
-                          Expanded(child: Text(data.whatFor)),
-                          Spacer(),
-                          Expanded(
-                            child: Text(data.name ?? 'anonymous'),
+                    ? Card(
+                        color: Colors.white.withAlpha(20),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(minHeight: 64),
+                            child: IntrinsicHeight(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (usageReceived)
+                                    Expanded(
+                                        child: Text(
+                                            data.date?.toDateTime().format() ??
+                                                'missing')),
+                                  Expanded(
+                                      child: Text(
+                                    data.amount.toCurrency(),
+                                    textAlign: TextAlign.justify,
+                                  )),
+                                  Expanded(child: Text(data.whatFor)),
+                                  Spacer(),
+                                  Expanded(
+                                    child: Text(data.name ?? 'anonymous'),
+                                  ),
+                                  if (loggedIn)
+                                    Expanded(
+                                      child:
+                                          Text(data.hiddenName ?? 'anonymous'),
+                                    ),
+                                  Expanded(
+                                    child: _EnlargableImage(
+                                      imageLink: data.imageLink,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: _EnlargableImage(
+                                      imageLink: data.imageReceiverLink,
+                                    ),
+                                  ),
+                                  if (loggedIn)
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                            onPressed: () async {
+                                              await showAddEditUsageDlg(context,
+                                                  usage: data,
+                                                  waiting: !usageReceived);
+                                            },
+                                            icon: Icon(Icons.edit)),
+                                        IconButton(
+                                          onPressed: () async {
+                                            final shouldDelete =
+                                                await showQueryDialog(
+                                                    context,
+                                                    'Warning!',
+                                                    'Do you really want to delete this entry?');
+                                            if (shouldDelete) {
+                                              get<DonationManager>()
+                                                  .deleteUsage!(data);
+                                            }
+                                          },
+                                          icon: Icon(Icons.delete),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            ),
                           ),
-                          if (loggedIn)
-                            Expanded(
-                              child: Text(data.hiddenName ?? 'anonymous'),
-                            ),
-                          Expanded(
-                            child: _EnlargableImage(
-                              imageLink: data.imageLink,
-                            ),
-                          ),
-                          Expanded(
-                            child: _EnlargableImage(
-                              imageLink: data.imageReceiverLink,
-                            ),
-                          ),
-                          if (loggedIn)
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                    onPressed: () async {
-                                      await showAddEditUsageDlg(context,
-                                          usage: data, waiting: !usageReceived);
-                                    },
-                                    icon: Icon(Icons.edit)),
-                                IconButton(
-                                  onPressed: () async {
-                                    final shouldDelete = await showQueryDialog(
-                                        context,
-                                        'Warning!',
-                                        'Do you really want to delete this entry?');
-                                    if (shouldDelete) {
-                                      get<DonationManager>().deleteUsage!(data);
-                                    }
-                                  },
-                                  icon: Icon(Icons.delete),
-                                ),
-                              ],
-                            ),
-                        ],
+                        ),
                       )
                     : Card(
                         color: Colors.white.withAlpha(20),
@@ -208,27 +224,24 @@ class _EnlargableImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 100, maxHeight: 100),
-        child: imageLink == null
-            ? Container()
-            : Image.network(
-                imageLink!,
-                loadingBuilder: (BuildContext context, Widget child,
-                    ImageChunkEvent? loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
-                    ),
-                  );
-                },
-                fit: BoxFit.contain,
-              ),
-      ),
+      child: imageLink == null
+          ? Container()
+          : Image.network(
+              imageLink!,
+              loadingBuilder: (BuildContext context, Widget child,
+                  ImageChunkEvent? loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                  ),
+                );
+              },
+              fit: BoxFit.cover,
+            ),
       onTap: imageLink != null
           ? () {
               showDialog(
