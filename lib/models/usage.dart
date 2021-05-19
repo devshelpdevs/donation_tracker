@@ -1,4 +1,5 @@
 import 'package:donation_tracker/constants.dart';
+import 'package:donation_tracker/utils.dart';
 
 ///We use the same table for already used money as well as for people waiting for help
 /// if [date] is null it means that this is a waiting entry
@@ -36,11 +37,17 @@ class Usage {
   final String? hiddenName;
   final String? image;
   final String? imageReceiver;
+
   String? get imageLink =>
       image == null ? null : '$nhostBaseUrl/storage/o/public/$image';
+
   String? get imageReceiverLink => imageReceiver == null
       ? null
       : '$nhostBaseUrl/storage/o/public/$imageReceiver';
+
+  String get dateText {
+    return date?.toDateTime().format() ?? 'missing';
+  }
 
   Usage copyWith({
     int? id,
