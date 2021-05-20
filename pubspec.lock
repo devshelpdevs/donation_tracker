@@ -35,7 +35,7 @@ packages:
       name: async
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.6.1"
+    version: "2.6.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -132,7 +132,7 @@ packages:
     description:
       path: "."
       ref: null-safety
-      resolved-ref: "4a64ff9fea0849d94c840301d68b0c63e4cce2de"
+      resolved-ref: "76c83207841dcb6d98e706d6a50882697c93a2c1"
       url: "https://github.com/escamoteur/dropfiles_window"
     source: git
     version: "0.1.2"
@@ -149,7 +149,7 @@ packages:
       name: file
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.1.0"
+    version: "6.1.1"
   file_selector:
     dependency: "direct main"
     description:
@@ -248,49 +248,56 @@ packages:
       name: gql
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.13.0-nullsafety.2"
+    version: "0.13.0"
   gql_dedupe_link:
     dependency: transitive
     description:
       name: gql_dedupe_link
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0-nullsafety.1"
+    version: "2.0.0"
   gql_error_link:
     dependency: transitive
     description:
       name: gql_error_link
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.0-nullsafety.1"
+    version: "0.2.0"
   gql_exec:
     dependency: transitive
     description:
       name: gql_exec
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.0-nullsafety.2"
+    version: "0.3.0"
   gql_http_link:
     dependency: transitive
     description:
       name: gql_http_link
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.0-nullsafety.1"
+    version: "0.4.0"
   gql_link:
     dependency: transitive
     description:
       name: gql_link
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.0-nullsafety.3"
+    version: "0.4.0"
   gql_transform_link:
     dependency: transitive
     description:
       name: gql_transform_link
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.0-nullsafety.1"
+    version: "0.2.0"
+  gql_websocket_link:
+    dependency: transitive
+    description:
+      name: gql_websocket_link
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   graphql:
     dependency: "direct main"
     description:
@@ -403,20 +410,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
+  nhost_gql_links:
+    dependency: transitive
+    description:
+      name: nhost_gql_links
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.2"
   nhost_graphql_adapter:
     dependency: "direct main"
     description:
       name: nhost_graphql_adapter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.4"
   nhost_sdk:
     dependency: "direct main"
     description:
       name: nhost_sdk
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.3"
   node_preamble:
     dependency: transitive
     description:
@@ -430,7 +444,7 @@ packages:
       name: normalize
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.1-0.1.nullsafety.0"
+    version: "0.5.2"
   package_config:
     dependency: transitive
     description:
@@ -528,7 +542,7 @@ packages:
       name: shelf
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.2"
+    version: "1.1.4"
   shelf_packages_handler:
     dependency: transitive
     description:
