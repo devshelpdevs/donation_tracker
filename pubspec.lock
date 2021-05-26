@@ -7,14 +7,14 @@ packages:
       name: _fe_analyzer_shared
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "21.0.0"
+    version: "22.0.0"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.5.0"
+    version: "1.6.0"
   archive:
     dependency: transitive
     description:
@@ -248,7 +248,7 @@ packages:
       name: gql
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.13.0"
+    version: "0.13.1-alpha+1621584656247"
   gql_dedupe_link:
     dependency: transitive
     description:
@@ -269,7 +269,7 @@ packages:
       name: gql_exec
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.0"
+    version: "0.3.1-alpha+1621584656254"
   gql_http_link:
     dependency: transitive
     description:
@@ -283,7 +283,7 @@ packages:
       name: gql_link
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.0"
+    version: "0.4.1-alpha+1621584656261"
   gql_transform_link:
     dependency: transitive
     description:
@@ -292,12 +292,12 @@ packages:
     source: hosted
     version: "0.2.0"
   gql_websocket_link:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: gql_websocket_link
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.0"
+    version: "0.3.2-alpha+1621584656268"
   graphql:
     dependency: "direct main"
     description:
@@ -374,7 +374,7 @@ packages:
       name: layout
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.1"
+    version: "0.6.2"
   logging:
     dependency: transitive
     description:
@@ -416,14 +416,14 @@ packages:
       name: nhost_gql_links
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.2"
+    version: "1.0.3"
   nhost_graphql_adapter:
     dependency: "direct main"
     description:
       name: nhost_graphql_adapter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.4"
+    version: "1.0.5"
   nhost_sdk:
     dependency: "direct main"
     description:
@@ -521,7 +521,7 @@ packages:
       name: reactive_forms
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "10.2.0"
+    version: "10.3.0"
   routemaster:
     dependency: "direct main"
     description:
@@ -652,7 +652,7 @@ packages:
       name: url_launcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.0.3"
+    version: "6.0.4"
   url_launcher_linux:
     dependency: transitive
     description:
@@ -673,7 +673,7 @@ packages:
       name: url_launcher_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.2"
+    version: "2.0.3"
   url_launcher_web:
     dependency: transitive
     description:
@@ -736,7 +736,7 @@ packages:
       name: xml
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.1.0"
+    version: "5.1.1"
   yaml:
     dependency: transitive
     description:

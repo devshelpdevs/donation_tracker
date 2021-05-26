@@ -29,10 +29,10 @@ dependencies:
       ref: null-safety
   graphql: 5.0.0-nullsafety.1
   get_it: ^7.1.2
-  file_selector: 
-  file_selector_windows: ^0.0.2 
+  file_selector:
+  file_selector_windows: ^0.0.2
   flutter_command: any
-  get_it_mixin: ^3.1.1 
+  get_it_mixin: ^3.1.1
   image:
   url_launcher:
   rxdart:
@@ -41,17 +41,23 @@ dependencies:
   deep_pick: ^0.8.0
   flutter_svg:
   modal_bottom_sheet: ^2.0.0
-  nhost_sdk: 
-  nhost_graphql_adapter: 
   reactive_forms:
   routemaster: ^0.8.1
   flutter:
     sdk: flutter
 
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+
+  # Nhost-related
+  nhost_sdk:
+  nhost_graphql_adapter:
+
+  # This pre-release version is required to avoid bugs related to subscriptions
+  # reconnecting after auth changes. Once 0.3.2 stable is released, this can
+  # be updated.
+  gql_websocket_link: ^0.3.2-alpha+1621584656268
 
 dev_dependencies:
   test:
