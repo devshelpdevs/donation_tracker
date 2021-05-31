@@ -16,11 +16,7 @@ To select the staging backend you have to pass in the server it should use:
 --dart-define SERVER=63b34375.nhost.app
 ```
 
-To be able to make mutation to data you have to log-in:
-
-```dart
-    await server.loginUser('mail@devshelpdevs.org', 'staging');
-```
+To be able to make mutation to data you have to log-in. you do that be double clicking on the DHD logo. If you selected the staging configuration you don't have to provide a password.
 
 For VS code I included 2 different run configurations to switch between read only production database and write access staging server.
 If you don't provide any environment variable the app defaults to read only production server.
