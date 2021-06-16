@@ -57,173 +57,177 @@ class DonationUsages extends StatelessWidget with GetItMixin {
           ),
         SizedBox(height: 8),
         Expanded(
-          child: ListView(
-              children: usages.map(
-            (data) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: context.layout.value(xs: false, sm: false, md: true)
-                    ? Card(
-                        color: Colors.white.withAlpha(20),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (usageReceived)
-                                Expanded(
-                                  child: Text(data.dateText),
-                                ),
-                              Expanded(
-                                child: Text(
-                                  data.amount.toCurrency(),
-                                  textAlign: TextAlign.justify,
-                                ),
-                              ),
-                              Expanded(flex: 3, child: Text(data.whatFor)),
-                              Spacer(),
-                              Expanded(
-                                child: Text(data.name ?? 'anonymous'),
-                              ),
-                              if (loggedIn)
-                                Expanded(
-                                  child: InkWell(
-                                      onTap: () async {
-                                        if (data.hiddenName != null) {
-                                          if (data.hiddenName!
-                                              .startsWith('@')) {
-                                            final twitterName =
-                                                data.hiddenName!.substring(1);
-                                            await launch(
-                                                'https://twitter.com/$twitterName');
-                                          }
-                                        }
-                                      },
-                                      child:
-                                          Text(data.hiddenName ?? 'anonymous')),
-                                ),
-                              _ImageRow(
-                                picHeight: imageSize,
-                                productUrl: data.imageLink!,
-                                receiverUrl: data.imageReceiverLink,
-                              ),
-                              if (loggedIn)
-                                Expanded(
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(
-                                          onPressed: () async {
-                                            await showAddEditUsageDlg(context,
-                                                usage: data,
-                                                waiting: !usageReceived);
-                                          },
-                                          icon: Icon(Icons.edit)),
-                                      IconButton(
-                                        onPressed: () async {
-                                          final shouldDelete =
-                                              await showQueryDialog(
-                                                  context,
-                                                  'Warning!',
-                                                  'Do you really want to delete this entry?');
-                                          if (shouldDelete) {
-                                            get<DonationManager>()
-                                                .deleteUsage!(data);
-                                          }
-                                        },
-                                        icon: Icon(Icons.delete),
-                                      ),
-                                    ],
+          child: Scrollbar(
+            isAlwaysShown: true,
+            child: ListView(
+                children: usages.map(
+              (data) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: context.layout.value(xs: false, sm: false, md: true)
+                      ? Card(
+                          color: Colors.white.withAlpha(20),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (usageReceived)
+                                  Expanded(
+                                    child: Text(data.dateText),
                                   ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      )
-                    : Card(
-                        color: Colors.white.withAlpha(20),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  usageReceived
-                                      ? Text(data.date?.toDateTime().format() ??
-                                          'missing')
-                                      : SizedBox(),
-                                  Text(
+                                Expanded(
+                                  child: Text(
                                     data.amount.toCurrency(),
                                     textAlign: TextAlign.justify,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 16),
                                   ),
-                                ],
-                              ),
-                              SizedBox(height: 8),
-                              Text(data.whatFor),
-                              SizedBox(height: 16),
-                              Text(data.name ?? 'anonymous'),
-                              SizedBox(height: 8),
-                              if (loggedIn)
-                                Text(data.hiddenName ?? 'anonymous'),
-                              SizedBox(height: 16),
-                              SizedBox(
-                                height: 128,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    _EnlargableImage(
-                                      imageLink: data.imageLink,
+                                ),
+                                Expanded(flex: 3, child: Text(data.whatFor)),
+                                Spacer(),
+                                Expanded(
+                                  child: Text(data.name ?? 'anonymous'),
+                                ),
+                                if (loggedIn)
+                                  Expanded(
+                                    child: InkWell(
+                                        onTap: () async {
+                                          if (data.hiddenName != null) {
+                                            if (data.hiddenName!
+                                                .startsWith('@')) {
+                                              final twitterName =
+                                                  data.hiddenName!.substring(1);
+                                              await launch(
+                                                  'https://twitter.com/$twitterName');
+                                            }
+                                          }
+                                        },
+                                        child: Text(
+                                            data.hiddenName ?? 'anonymous')),
+                                  ),
+                                _ImageRow(
+                                  picHeight: imageSize,
+                                  productUrl: data.imageLink!,
+                                  receiverUrl: data.imageReceiverLink,
+                                ),
+                                if (loggedIn)
+                                  Expanded(
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                            onPressed: () async {
+                                              await showAddEditUsageDlg(context,
+                                                  usage: data,
+                                                  waiting: !usageReceived);
+                                            },
+                                            icon: Icon(Icons.edit)),
+                                        IconButton(
+                                          onPressed: () async {
+                                            final shouldDelete =
+                                                await showQueryDialog(
+                                                    context,
+                                                    'Warning!',
+                                                    'Do you really want to delete this entry?');
+                                            if (shouldDelete) {
+                                              get<DonationManager>()
+                                                  .deleteUsage!(data);
+                                            }
+                                          },
+                                          icon: Icon(Icons.delete),
+                                        ),
+                                      ],
                                     ),
-                                    _EnlargableImage(
-                                      imageLink: data.imageReceiverLink,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : Card(
+                          color: Colors.white.withAlpha(20),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    usageReceived
+                                        ? Text(
+                                            data.date?.toDateTime().format() ??
+                                                'missing')
+                                        : SizedBox(),
+                                    Text(
+                                      data.amount.toCurrency(),
+                                      textAlign: TextAlign.justify,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 16),
                                     ),
                                   ],
                                 ),
-                              ),
-                              if (loggedIn)
-                                Expanded(
+                                SizedBox(height: 8),
+                                Text(data.whatFor),
+                                SizedBox(height: 16),
+                                Text(data.name ?? 'anonymous'),
+                                SizedBox(height: 8),
+                                if (loggedIn)
+                                  Text(data.hiddenName ?? 'anonymous'),
+                                SizedBox(height: 16),
+                                SizedBox(
+                                  height: 128,
                                   child: Row(
-                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: [
-                                      IconButton(
-                                          onPressed: () async {
-                                            await showAddEditUsageDlg(context,
-                                                usage: data,
-                                                waiting: !usageReceived);
-                                          },
-                                          icon: Icon(Icons.edit)),
-                                      IconButton(
-                                        onPressed: () async {
-                                          final shouldDelete =
-                                              await showQueryDialog(
-                                                  context,
-                                                  'Warning!',
-                                                  'Do you really want to delete this entry?');
-                                          if (shouldDelete) {
-                                            get<DonationManager>()
-                                                .deleteUsage!(data);
-                                          }
-                                        },
-                                        icon: Icon(Icons.delete),
+                                      _EnlargableImage(
+                                        imageLink: data.imageLink,
+                                      ),
+                                      _EnlargableImage(
+                                        imageLink: data.imageReceiverLink,
                                       ),
                                     ],
                                   ),
                                 ),
-                            ],
+                                if (loggedIn)
+                                  Expanded(
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                            onPressed: () async {
+                                              await showAddEditUsageDlg(context,
+                                                  usage: data,
+                                                  waiting: !usageReceived);
+                                            },
+                                            icon: Icon(Icons.edit)),
+                                        IconButton(
+                                          onPressed: () async {
+                                            final shouldDelete =
+                                                await showQueryDialog(
+                                                    context,
+                                                    'Warning!',
+                                                    'Do you really want to delete this entry?');
+                                            if (shouldDelete) {
+                                              get<DonationManager>()
+                                                  .deleteUsage!(data);
+                                            }
+                                          },
+                                          icon: Icon(Icons.delete),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-              );
-            },
-          ).toList()),
+                );
+              },
+            ).toList()),
+          ),
         )
       ]),
     );

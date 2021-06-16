@@ -277,12 +277,24 @@ class _Header extends StatelessWidget with GetItMixin {
                     ),
                     Flexible(
                       child: FittedBox(
-                        child: Button(
-                          onPressed: () async {
-                            await launch(
-                                'https://paypal.me/pools/c/8xPwkVP3th');
-                          },
-                          text: 'Donate here',
+                        child: Column(
+                          children: [
+                            Button(
+                              onPressed: () async {
+                                await launch(
+                                    'https://paypal.me/pools/c/8A9qN9dojK');
+                              },
+                              text: 'Make a one-time Donation',
+                            ),
+                            SizedBox(height: 8),
+                            Button(
+                              onPressed: () async {
+                                await launch(
+                                    'https://github.com/sponsors/DevsHelpDevs');
+                              },
+                              text: 'Get a Github Sponsor',
+                            ),
+                          ],
                         ),
                       ),
                     ),
