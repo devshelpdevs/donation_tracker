@@ -54,11 +54,6 @@ dependencies:
   nhost_sdk:
   nhost_graphql_adapter:
 
-  # This pre-release version is required to avoid bugs related to subscriptions
-  # reconnecting after auth changes. Once 0.3.2 stable is released, this can
-  # be updated.
-  gql_websocket_link: ^0.3.2-alpha+1621584656268
-
 dev_dependencies:
   test:
   flutter_test:
